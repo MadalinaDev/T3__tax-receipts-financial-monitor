@@ -9,7 +9,7 @@ import {
   sessions,
   users,
   verificationTokens,
-} from "~/server/db/schema";
+} from "~/server/db/root";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {

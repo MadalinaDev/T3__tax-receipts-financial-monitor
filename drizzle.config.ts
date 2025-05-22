@@ -1,12 +1,30 @@
-import { type Config } from "drizzle-kit";
-
 import { env } from "~/env";
+import { defineConfig } from "drizzle-kit";
 
-export default {
-  schema: "./src/server/db/schema.ts",
+const drizzleConfig = defineConfig({
+  out: "./drizzle",
   dialect: "postgresql",
+  schema: "./src/server/db/schema/**/*.ts",
+
   dbCredentials: {
     url: env.DATABASE_URL,
   },
-  tablesFilter: ["tax-receipts-financial-monitor__t3_*"],
-} satisfies Config;
+
+  /*
+  extensionsFilters: ["postgis"],
+*/
+  schemaFilter: "public",
+  tablesFilter: "*",
+
+  introspect: {
+    casing: "camel",
+  },
+
+  migrations: {
+    prefix: "timestamp",
+    table: "__drizzle_migrations__",
+    schema: "public",
+  },
+});
+
+export default drizzleConfig;
