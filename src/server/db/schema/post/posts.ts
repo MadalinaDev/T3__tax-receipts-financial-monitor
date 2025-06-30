@@ -1,6 +1,5 @@
-import { sql, relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { users } from "../account/users";
 
 export const posts = pgTable("posts", {
   id: uuid("id")
@@ -9,8 +8,7 @@ export const posts = pgTable("posts", {
     .primaryKey(),
   name: text("name").notNull(),
   createdById: uuid("created_by_id")
-    .notNull()
-    .references(() => users.id),
+    .notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -18,7 +16,3 @@ export const posts = pgTable("posts", {
     () => new Date(),
   ),
 });
-
-export const postsRelations = relations(posts, ({ one }) => ({
-  user: one(users, { fields: [posts.id], references: [users.id] }),
-}));
