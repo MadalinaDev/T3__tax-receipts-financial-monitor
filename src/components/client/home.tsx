@@ -5,7 +5,14 @@ const Home = () => {
   const { user } = useUser();
   return (
     <div>
-      <div>The current logged in user: {user?.fullName ?? user?.emailAddresses[0]?.emailAddress} </div>
+      {user ? (
+        <div>
+          The current user logged in:{" "}
+          {user?.fullName ?? user?.emailAddresses[0]?.emailAddress}{" "}
+        </div>
+      ) : (
+        <div>No user logged in</div>
+      )}
     </div>
   );
 };
