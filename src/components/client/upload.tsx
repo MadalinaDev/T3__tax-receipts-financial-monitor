@@ -27,7 +27,7 @@ const Upload = () => {
             Link
           </Label>
           <Input id="link" placeholder="https://" />
-          <Button variant="default" onClick={() => {}} className="my-2 w-full">
+          <Button variant="default" className="my-2 w-full">
             Process
           </Button>
         </TabsContent>
@@ -41,7 +41,7 @@ const Upload = () => {
               </div>
             </CardContent>
           </Card>
-          <Button variant="default" onClick={() => {}} className="my-2 w-full">
+          <Button variant="default" className="my-2 w-full">
             Process
           </Button>
         </TabsContent>
@@ -86,7 +86,7 @@ const Upload = () => {
               <Input id="issue-date" type="date" />
             </div>
           </div>
-          <Button variant="default" onClick={() => {}} className="my-2 w-full">
+          <Button variant="default" className="my-2 w-full">
             Process
           </Button>
         </TabsContent>
