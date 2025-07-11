@@ -11,16 +11,18 @@ import {
 const Header = () => {
   return (
     <div>
-      <div className="flex flex-row items-center gap-x-12 bg-gray-200 px-36 py-4 text-lg">
-        <Link href="">Financial Monitor</Link>
-        <Link href="">Upload</Link>
-        <Link href="">Receipts</Link>
-        <Link href="">Statistics</Link>
-        <div className="ml-auto">
+      <div className="text-md flex min-h-[10vh] flex-col items-center gap-x-4 bg-gray-200 px-12 py-2 md:flex-row md:gap-x-12 md:px-36 md:py-4">
+        <Link href="/" className="whitespace-nowrap">
+          Financial Monitor
+        </Link>
+        <Link href="/upload">Upload</Link>
+        <Link href="/receipts">Receipts</Link>
+        <Link href="/statistics">Statistics</Link>
+        <div className="flex w-full flex-row items-center justify-center md:justify-end">
           <SignedOut>
             <SignInButton />
             <SignUpButton>
-              <button className="ml-6 h-10 cursor-pointer rounded-full bg-gray-500 px-4 text-sm font-medium text-white sm:h-12 sm:px-5 sm:text-base">
+              <button className="ml-2 cursor-pointer rounded-full bg-gray-500 px-4 py-2 text-sm font-medium text-white md:ml-6">
                 Sign Up
               </button>
             </SignUpButton>
