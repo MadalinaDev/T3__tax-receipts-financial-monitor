@@ -5,8 +5,20 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Scan } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const Upload = () => {
+
+  const [link, setLink] = useState("");
+
+  const router = useRouter();
+
+  const processScrapeByLink = () => {
+    console.log("clicked")
+    router.push(`/upload?scrapeLink=${link}`);
+  }
+
   return (
     <div className="mx-2 my-2 md:mx-72 md:my-12">
       <div className="my-10 text-center">
@@ -26,8 +38,8 @@ const Upload = () => {
           <Label htmlFor="link" className="m-2">
             Link
           </Label>
-          <Input id="link" placeholder="https://" />
-          <Button variant="default" className="my-2 w-full">
+          <Input id="link" placeholder="https://" onChange={e => setLink(e.target.value)}/>
+          <Button onClick={() => {if (link) processScrapeByLink()}} variant="default" className="my-2 w-full">
             Process
           </Button>
         </TabsContent>
