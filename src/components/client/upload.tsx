@@ -15,7 +15,6 @@ const Upload = () => {
   const router = useRouter();
 
   const processScrapeByLink = () => {
-    console.log("clicked")
     router.push(`/upload?scrapeLink=${link}`);
   }
 

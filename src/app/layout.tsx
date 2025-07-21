@@ -15,7 +15,7 @@ export default function RootLayout({
           <body>
             <HydrateClient>
               <Header />
-              <div className="md:mx-36 mx-8">{children}</div>
+              <div className="md:mx-36 mx-8 text-muted-foregroud!">{children}</div>
               {/* <Footer /> */}
             </HydrateClient>
           </body>
