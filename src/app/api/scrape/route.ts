@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   let browser: Browser | BrowserCore;
   if (process.env.NODE_ENV === "production") {
     const executablePath = await chromium.executablePath(
-      "https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v138.0.2-pack.arm64.tar",
+      "https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.arm64.tar",
     );
     browser = await puppeteerCore.launch({
       executablePath,
