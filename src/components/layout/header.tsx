@@ -15,9 +15,15 @@ const Header = () => {
         <Link href="/" className="whitespace-nowrap">
           Financial Monitor
         </Link>
-        <Link href="/upload">Upload</Link>
-        <Link href="/receipts">Receipts</Link>
-        <Link href="/statistics">Statistics</Link>
+        <Link href="/upload" prefetch={false}>
+          Upload
+        </Link>
+        <Link href="/receipts" prefetch={false}>
+          Receipts
+        </Link>
+        <Link href="/statistics" prefetch={false}>
+          Statistics
+        </Link>
         <div className="flex w-full flex-row items-center justify-center md:justify-end">
           <SignedOut>
             <SignInButton />
