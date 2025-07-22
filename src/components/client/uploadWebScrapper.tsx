@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import type { ReceiptType } from "~/types/receipt";
 
 const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptType | null>(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
 
   return (
     <div>
-      {loading ? (
+      {loading !== false ? (
         <div className="my-[15%] w-full">
           <Loader2 className="mx-auto animate-spin" />
         </div>
@@ -48,7 +48,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
             <Check className="size-8 md:size-6" />
             <div>
               {" "}
-              Your receipt information was web scrapped successfully. For more
+              Your receipt information was scrapped successfully. For more
               details check the console.
             </div>
           </div>
