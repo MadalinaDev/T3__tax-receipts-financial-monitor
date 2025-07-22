@@ -1,2 +1,2 @@
-import { posts } from "./schema/post/posts";
-export { posts };
+import { receipts } from "./schema/receipts";
+export { receipts };
