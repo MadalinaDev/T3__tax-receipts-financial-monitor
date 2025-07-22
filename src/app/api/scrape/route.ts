@@ -1,12 +1,25 @@
 import type { NextRequest } from "next/server";
-import puppeteer from "puppeteer";
+import puppeteer, { type Browser } from "puppeteer";
+import puppeteerCore, { type Browser as BrowserCore } from "puppeteer-core";
+import chromium from "@sparticuz/chromium-min";
 import * as cheerio from "cheerio";
 import type { Element } from "domhandler";
 
-
 // ---------- GET function for web scrapping the receipt data -----------------
 export async function GET(req: NextRequest) {
-  const browser = await puppeteer.launch();
+  let browser: Browser | BrowserCore;
+  if (process.env.NODE_ENV === "production") {
+    const executablePath = await chromium.executablePath(
+      "https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar",
+    );
+    browser = await puppeteerCore.launch({
+      executablePath,
+      args: chromium.args,
+      headless: true,
+    });
+  } else {
+    browser = await puppeteer.launch();
+  }
 
   try {
     const { searchParams } = new URL(req.url);
@@ -23,7 +36,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const page = await browser.newPage();
+    const page = await (browser as Browser).newPage();
     await page.setViewport({
       width: 1920,
       height: 1080,
@@ -33,10 +46,7 @@ export async function GET(req: NextRequest) {
     });
 
     await page.waitForSelector("#newFormTest");
-    const htmlContent = await page.$eval(
-      "#newFormTest",
-      el => el.innerHTML,
-    );
+    const htmlContent = await page.$eval("#newFormTest", (el) => el.innerHTML);
 
     const $ = cheerio.load(htmlContent);
 
