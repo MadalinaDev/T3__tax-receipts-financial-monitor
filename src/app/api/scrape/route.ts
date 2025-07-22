@@ -10,15 +10,17 @@ export async function GET(req: NextRequest) {
   let browser: Browser | BrowserCore;
   if (process.env.NODE_ENV === "production") {
     const executablePath = await chromium.executablePath(
-      "https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar",
+      "https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v138.0.2-pack.arm64.tar",
     );
     browser = await puppeteerCore.launch({
       executablePath,
-      args: chromium.args,
       headless: true,
     });
   } else {
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
   }
 
   try {
