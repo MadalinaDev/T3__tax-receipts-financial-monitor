@@ -1,15 +1,28 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Loader2, Check, Ban, HardDriveUpload } from "lucide-react";
+import {
+  Loader2,
+  Check,
+  Ban,
+  HardDriveUpload,
+  PartyPopper,
+  MoveRight,
+} from "lucide-react";
 import Receipt from "./receiptSkeleton";
 import { Button } from "../ui/button";
 import type { ReceiptType } from "~/types/receipt";
 import { api } from "~/trpc/react";
-import { type ProductsInsert} from "~/types/receipt";
+import { type ProductsInsert } from "~/types/receipt";
+import Link from "next/link";
 
 const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   const [loading, setLoading] = useState<boolean | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptType | null>(null);
+  const [startedConfirm, setStartedConfirm] = useState<boolean>(false);
+  const [confirmationMessage, setConfirmationMessage] = useState<{
+    success: boolean;
+    message: string;
+  }>();
 
   useEffect(() => {
     setLoading(true);
@@ -38,12 +51,33 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
     void scrapeByLink();
   }, [scrapeLink]);
 
-  const saveReceiptData = api.receipts.create.useMutation();
+  const saveReceiptData = api.receipts.create.useMutation({
+    onSuccess: () => {
+      setConfirmationMessage({
+        success: true,
+        message: "Your receipt was successfully uploaded into the system!",
+      });
+    },
+    onError: (e) => {
+      setConfirmationMessage({
+        success: false,
+        message:
+          "An unexpected error occured while uploading your receipt. Please try again later.",
+      });
+      console.error("Error: ", e);
+    },
+    onSettled: () => {
+      setLoading(false);
+    },
+  });
 
   const handleSaveReceiptData = () => {
-
+    setLoading(true);
+    setStartedConfirm(true);
     if (!receiptData) {
-      console.error("Client-side error: there is no valid data to be uploaded.");
+      console.error(
+        "Client-side error: there is no valid data to be uploaded.",
+      );
       return;
     }
 
@@ -76,18 +110,39 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
 
   return (
     <div>
-      {loading !== false ? (
+      {confirmationMessage ? (
+        <div className="my-48">
+          <div className="text-muted-foreground flex flex-row items-center justify-center gap-4">
+            {confirmationMessage.success ? (
+              <PartyPopper className="size-8 md:size-6" />
+            ) : (
+              <Ban className="size-8 md:size-6" />
+            )}
+            {confirmationMessage.message}
+          </div>
+          <div className="mt-4 flex justify-center text-muted-foreground">
+            <Link href={confirmationMessage.success ? "/statistics" : "/"}>
+              <Button variant="outline" className="mx-auto px-6">
+                {confirmationMessage.success
+                  ? "Check out your statistics"
+                  : "Go to main page"}
+                <MoveRight className="size-8 md:size-6" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : loading !== false || startedConfirm ? (
         <div className="my-[15%] w-full">
           <Loader2 className="mx-auto animate-spin" />
         </div>
       ) : receiptData ? (
         <div>
-          <div className="mx-auto my-[5%] flex flex-row items-start justify-center gap-4 md:gap-6">
+          <div className="mx-auto mt-12 mb-6 flex flex-row items-start justify-center gap-4 md:gap-6">
             <Check className="size-8 md:size-6" />
             <div>
               {" "}
-              Your receipt information was scrapped successfully. For more
-              details check the console.
+              Your receipt information was scrapped successfully. Review the
+              details below:
             </div>
           </div>
           <Receipt receiptData={receiptData} />

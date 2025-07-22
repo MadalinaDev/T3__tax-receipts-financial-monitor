@@ -1,7 +1,7 @@
 import Upload from "~/components/client/upload";
 import UploadWebScrapper from "~/components/client/uploadWebScrapper";
 
-export default async function Uploadpage({
+export default async function UploadPage({
   searchParams,
 }: {
   searchParams: Promise<{ scrapeLink: string }>;
