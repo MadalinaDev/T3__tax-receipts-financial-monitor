@@ -56,7 +56,23 @@ export async function GET(req: NextRequest) {
       waitUntil: "networkidle0",
     });
 
-    await page.waitForSelector("#newFormTest");
+    // await page.waitForSelector("#newFormTest");
+    try {
+      await page.waitForSelector("#newFormTest", {
+        timeout: 60000, // Increase to 60 seconds
+        visible: true, // Ensure element is actually visible
+      });
+    } catch (error) {
+      console.error("Selector timeout error:", error);
+      console.log("Page URL:", page.url());
+      console.log("Page title:", await page.title());
+
+      // Take a screenshot for debugging
+      const screenshot = await page.screenshot({ encoding: "base64" });
+      console.log("Screenshot (base64):", screenshot.substring(0, 100) + "...");
+
+      throw error;
+    }
 
     const element = await page.$("#newFormTest");
     if (!element) {
@@ -179,8 +195,6 @@ export async function GET(req: NextRequest) {
     console.error("Server-side error during web scrapping: ", e);
     return new Response(JSON.stringify({}), { status: 500 });
   } finally {
-    if (process.env.NODE_ENV !== "production") {
-      await browser.close();
-    }
+    await browser.close();
   }
 }
