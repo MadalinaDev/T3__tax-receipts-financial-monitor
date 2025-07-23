@@ -10,8 +10,17 @@ import type { Element } from "domhandler";
 // ---------- GET function for web scrapping the receipt data -----------------
 export async function GET(req: NextRequest) {
   let browser;
-  if (process.env.VERCEL_ENV === "production") {
-    const executablePath = await chromium.executablePath();
+  if (process.env.NODE_ENV === "production") {
+    console.log("UNU");
+    let executablePath = "";
+    try {
+      executablePath = await chromium.executablePath();
+      console.log("Chromium path:", executablePath);
+    } catch (error) {
+      console.error("Error getting chromium executable path:", error);
+    }
+    console.log("Chromium path:", executablePath);
+
     browser = await puppeteerCore.launch({
       executablePath,
       args: chromium.args,
@@ -20,6 +29,7 @@ export async function GET(req: NextRequest) {
     browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
+    console.log("doi");
   }
 
   try {
@@ -47,7 +57,13 @@ export async function GET(req: NextRequest) {
     });
 
     await page.waitForSelector("#newFormTest");
-    const htmlContent = await page.$eval("#newFormTest", (el) => el.innerHTML);
+
+    const element = await page.$("#newFormTest");
+    if (!element) {
+      throw new Error("Element #newFormTest not found");
+    }
+    const htmlProperty = await element.getProperty("innerHTML");
+    const htmlContent = (await htmlProperty.jsonValue()) as string;
 
     const $ = cheerio.load(htmlContent);
 
@@ -69,8 +85,8 @@ export async function GET(req: NextRequest) {
     // ------------------------ PRODUCTS, QUANTITY, PRICE, TOTAL PRICE ----------------------------
     // raw unformatted data is extracted
     const texts = $("div > div > div > span")
-      .map((i: number, el: Element) => $(el).text().trim())
-      .get();
+      .toArray()
+      .map((el: Element) => $(el).text().trim());
     // data is formatted
     const products = [];
     for (let i = 0; i < texts.length; i++) {
@@ -163,7 +179,7 @@ export async function GET(req: NextRequest) {
     console.error("Server-side error during web scrapping: ", e);
     return new Response(JSON.stringify({}), { status: 500 });
   } finally {
-    if (process.env.VERCEL_ENV !== "production") {
+    if (process.env.NODE_ENV !== "production") {
       await browser.close();
     }
   }
