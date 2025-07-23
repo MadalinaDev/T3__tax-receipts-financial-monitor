@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       height: 1080,
     });
     await page.goto(scrapeLink, {
-      waitUntil: "networkidle2",
+      waitUntil: "networkidle0",
     });
 
     await page.waitForSelector("#newFormTest");
