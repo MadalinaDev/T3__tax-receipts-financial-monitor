@@ -1,24 +1,23 @@
 import type { NextRequest } from "next/server";
-import puppeteer, { type Browser } from "puppeteer";
-import puppeteerCore, { type Browser as BrowserCore } from "puppeteer-core";
-import chromium from "@sparticuz/chromium-min";
+
+import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
+
 import * as cheerio from "cheerio";
 import type { Element } from "domhandler";
 
 // ---------- GET function for web scrapping the receipt data -----------------
 export async function GET(req: NextRequest) {
-  let browser: Browser | BrowserCore;
-  if (process.env.NODE_ENV === "production") {
-    const executablePath = await chromium.executablePath(
-      // "https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.arm64.tar",
-    );
+  let browser;
+  if (process.env.VERCEL_ENV === "production") {
+    const executablePath = await chromium.executablePath();
     browser = await puppeteerCore.launch({
       executablePath,
       args: chromium.args,
     });
   } else {
     browser = await puppeteer.launch({
-      headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
   }
@@ -38,16 +37,14 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const page = await (browser as Browser).newPage();
-    // await page.setViewport({
-    //   width: 1920,
-    //   height: 1080,
-    // });
-    await page.goto(scrapeLink, 
-    //   {
-    //   waitUntil: "networkidle0",
-    // }
-  );
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+    });
+    await page.goto(scrapeLink, {
+      waitUntil: "networkidle2",
+    });
 
     await page.waitForSelector("#newFormTest");
     const htmlContent = await page.$eval("#newFormTest", (el) => el.innerHTML);
@@ -166,6 +163,8 @@ export async function GET(req: NextRequest) {
     console.error("Server-side error during web scrapping: ", e);
     return new Response(JSON.stringify({}), { status: 500 });
   } finally {
-    await browser.close();
+    if (process.env.VERCEL_ENV !== "production") {
+      await browser.close();
+    }
   }
 }
