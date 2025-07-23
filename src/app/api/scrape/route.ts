@@ -10,11 +10,11 @@ export async function GET(req: NextRequest) {
   let browser: Browser | BrowserCore;
   if (process.env.NODE_ENV === "production") {
     const executablePath = await chromium.executablePath(
-      "https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.arm64.tar",
+      // "https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.arm64.tar",
     );
     browser = await puppeteerCore.launch({
       executablePath,
-      headless: true,
+      args: chromium.args,
     });
   } else {
     browser = await puppeteer.launch({
@@ -39,13 +39,15 @@ export async function GET(req: NextRequest) {
     }
 
     const page = await (browser as Browser).newPage();
-    await page.setViewport({
-      width: 1920,
-      height: 1080,
-    });
-    await page.goto(scrapeLink, {
-      waitUntil: "networkidle0",
-    });
+    // await page.setViewport({
+    //   width: 1920,
+    //   height: 1080,
+    // });
+    await page.goto(scrapeLink, 
+    //   {
+    //   waitUntil: "networkidle0",
+    // }
+  );
 
     await page.waitForSelector("#newFormTest");
     const htmlContent = await page.$eval("#newFormTest", (el) => el.innerHTML);
