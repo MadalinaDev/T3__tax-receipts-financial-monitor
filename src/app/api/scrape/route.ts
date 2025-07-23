@@ -1,36 +1,58 @@
 import type { NextRequest } from "next/server";
 
-import puppeteer from "puppeteer";
-import puppeteerCore from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+// import puppeteer from "puppeteer";
+// import puppeteerCore from "puppeteer-core";
+// import chromium from "@sparticuz/chromium";
 
 import * as cheerio from "cheerio";
 import type { Element } from "domhandler";
 
+import { connect } from "puppeteer-real-browser";
+
 // ---------- GET function for web scrapping the receipt data -----------------
 export async function GET(req: NextRequest) {
-  let browser;
-  if (process.env.NODE_ENV === "production") {
-    console.log("UNU");
-    let executablePath = "";
-    try {
-      executablePath = await chromium.executablePath();
-      console.log("Chromium path:", executablePath);
-    } catch (error) {
-      console.error("Error getting chromium executable path:", error);
-    }
-    console.log("Chromium path:", executablePath);
+  // let browser;
+  const { page, browser } = await connect({
+    headless: false,
 
-    browser = await puppeteerCore.launch({
-      executablePath,
-      args: chromium.args,
-    });
-  } else {
-    browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-    console.log("doi");
-  }
+    args: [],
+
+    customConfig: {},
+
+    turnstile: true,
+
+    connectOption: {},
+
+    disableXvfb: false,
+    ignoreAllFlags: false,
+    // proxy:{
+    //     host:'<proxy-host>',
+    //     port:'<proxy-port>',
+    //     username:'<proxy-username>',
+    //     password:'<proxy-password>'
+    // }
+  });
+  // if (process.env.NODE_ENV === "production") {
+  //   console.log("UNU");
+  //   let executablePath = "";
+  //   try {
+  //     executablePath = await chromium.executablePath();
+  //     console.log("Chromium path:", executablePath);
+  //   } catch (error) {
+  //     console.error("Error getting chromium executable path:", error);
+  //   }
+  //   console.log("Chromium path:", executablePath);
+
+  //   browser = await puppeteerCore.launch({
+  //     executablePath,
+  //     args: chromium.args,
+  //   });
+  // } else {
+  //   browser = await puppeteer.launch({
+  //     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  //   });
+  //   console.log("doi");
+  // }
 
   try {
     const { searchParams } = new URL(req.url);
