@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     const $ = cheerio.load(htmlContent);
 
     const element = $("#newFormTest");
-    if (!element || !element.length) {
+    if (!element?.length) {
       return new Response(JSON.stringify({ error: "Element not found" }), {
         status: 500,
       });
