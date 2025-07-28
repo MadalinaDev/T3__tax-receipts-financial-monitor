@@ -1,60 +1,13 @@
 import type { NextRequest } from "next/server";
-
-// import puppeteer from "puppeteer";
-// import puppeteerCore from "puppeteer-core";
-// import chromium from "@sparticuz/chromium";
-
 import * as cheerio from "cheerio";
 import type { Element } from "domhandler";
 
-import { connect } from "puppeteer-real-browser";
+const API_KEY = process.env.SCRAPER_API_KEY;
 
 // ---------- GET function for web scrapping the receipt data -----------------
 export async function GET(req: NextRequest) {
-  // let browser;
-  const { page, browser } = await connect({
-    headless: false,
-
-    args: [],
-
-    customConfig: {},
-
-    turnstile: true,
-
-    connectOption: {},
-
-    disableXvfb: false,
-    ignoreAllFlags: false,
-    // proxy:{
-    //     host:'<proxy-host>',
-    //     port:'<proxy-port>',
-    //     username:'<proxy-username>',
-    //     password:'<proxy-password>'
-    // }
-  });
-  // if (process.env.NODE_ENV === "production") {
-  //   console.log("UNU");
-  //   let executablePath = "";
-  //   try {
-  //     executablePath = await chromium.executablePath();
-  //     console.log("Chromium path:", executablePath);
-  //   } catch (error) {
-  //     console.error("Error getting chromium executable path:", error);
-  //   }
-  //   console.log("Chromium path:", executablePath);
-
-  //   browser = await puppeteerCore.launch({
-  //     executablePath,
-  //     args: chromium.args,
-  //   });
-  // } else {
-  //   browser = await puppeteer.launch({
-  //     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  //   });
-  //   console.log("doi");
-  // }
-
   try {
+    console.log("heeiiiii");
     const { searchParams } = new URL(req.url);
     const scrapeLink = searchParams.get("link");
     if (!scrapeLink) {
@@ -69,56 +22,53 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const page = await browser.newPage();
-    await page.setViewport({
-      width: 1920,
-      height: 1080,
-    });
-    await page.goto(scrapeLink, {
-      waitUntil: "networkidle0",
-    });
+    console.log(scrapeLink);
+    console.log(encodeURIComponent(scrapeLink));
+    console.log(API_KEY);
+    const response = await fetch(
+      `http://api.scraperapi.com?api_key=${API_KEY}&url=${encodeURIComponent(scrapeLink)}`,
+    );
 
-    // await page.waitForSelector("#newFormTest");
-    try {
-      await page.waitForSelector("#newFormTest", {
-        timeout: 60000, // Increase to 60 seconds
-        visible: true, // Ensure element is actually visible
-      });
-    } catch (error) {
-      console.error("Selector timeout error:", error);
-      console.log("Page URL:", page.url());
-      console.log("Page title:", await page.title());
+    console.log(response);
+    const htmlContent = await response.text();
 
-      // Take a screenshot for debugging
-      const screenshot = await page.screenshot({ encoding: "base64" });
-      console.log("Screenshot (base64):", screenshot.substring(0, 100) + "...");
-
-      throw error;
-    }
-
-    const element = await page.$("#newFormTest");
-    if (!element) {
-      throw new Error("Element #newFormTest not found");
-    }
-    const htmlProperty = await element.getProperty("innerHTML");
-    const htmlContent = (await htmlProperty.jsonValue()) as string;
+    console.log(htmlContent);
 
     const $ = cheerio.load(htmlContent);
 
+    const element = $("#newFormTest");
+    if (!element || !element.length) {
+      return new Response(JSON.stringify({ error: "Element not found" }), {
+        status: 500,
+      });
+    }
+    console.log("sfsfsddf");
+
     // --------- extracting: --------------
     // ---------------------- COMPANY NAME, FISCAL CODE, ADDRESS, AND REGISTRATION NUMBER -------------
-    const companyName = $("div > div > div").first().text().trim();
-    const fiscalCode = $("div > div > div")
-      .eq(1)
-      .text()
-      .trim()
-      .replace(/\D/g, ""); // extract only the digits
-    const address = $("div > div > div").eq(2).text().trim();
-    const registartionNo = $("div > div > div")
-      .eq(3)
-      .text()
-      .trim()
-      .replace(/\D/g, ""); // extract only the digits
+    const data: string[] = [];
+
+    $("p.text-gray-600.text-xs").each((i, el) => {
+      const text = $(el).text().trim();
+      if (text) data.push(text);
+    });
+    const companyName = data[0];
+    const fiscalCode = data
+      .find((t) => t.includes("COD FISCAL"))
+      ?.replace("COD FISCAL:", "")
+      .trim();
+    const address = data[2];
+    const registrationNumber = data
+      .find((t) => t.includes("NUMARUL DE ÎNREGISTRARE"))
+      ?.replace("NUMARUL DE ÎNREGISTRARE:", "")
+      .trim();
+
+    console.log({
+      companyName,
+      fiscalCode,
+      address,
+      registrationNumber,
+    });
 
     // ------------------------ PRODUCTS, QUANTITY, PRICE, TOTAL PRICE ----------------------------
     // raw unformatted data is extracted
@@ -200,7 +150,7 @@ export async function GET(req: NextRequest) {
         name: companyName,
         fiscalCode: fiscalCode,
         address: address,
-        registrationNumber: registartionNo,
+        registrationNumber,
       },
       products, //{ name, quantity, price, totalPrice }
       totalAmount: total,
@@ -216,7 +166,5 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     console.error("Server-side error during web scrapping: ", e);
     return new Response(JSON.stringify({}), { status: 500 });
-  } finally {
-    await browser.close();
   }
 }
