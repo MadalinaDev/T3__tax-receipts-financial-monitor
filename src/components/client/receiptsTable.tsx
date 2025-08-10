@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -29,17 +29,47 @@ import {
   PaginationLink,
   PaginationPrevious,
   PaginationNext,
+  PaginationEllipsis,
 } from "../ui/pagination";
 import { api } from "~/trpc/react";
 import type { ReceiptWithProducts } from "~/types/receipt";
+import { useSearchParams, useRouter } from "next/navigation";
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_TOTAL_ITEMS = 3;
 
 const ReceiptsTable = () => {
-  const [offset, setOffset] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(3);
+  const searchParams = useSearchParams();
+
+  let initialPage = +(searchParams.get("page") ?? DEFAULT_PAGE);
+  if (initialPage < 1) initialPage = DEFAULT_PAGE;
+  let totalItems = +(searchParams.get("totalItems") ?? DEFAULT_TOTAL_ITEMS);
+  if (totalItems < 1) totalItems = DEFAULT_TOTAL_ITEMS;
+
   const { data: receipts, isPending } = api.receipts.get.useQuery({
-    offset,
-    limit,
+    page: initialPage,
+    totalItems,
   });
+
+  const router = useRouter();
+  const [page, setPage] = useState<number>(initialPage);
+
+  useEffect(() => {
+    if (receipts && page > receipts.totalPages) {
+      setPage(receipts.totalPages);
+      router.replace(
+        `/receipts?page=${receipts.totalPages}&totalItems=${totalItems}`,
+      );
+    }
+  }, [receipts]);
+
+  const pageButtonNumbers: number[] = [];
+  for (let i = page - 2; i <= page + 2; i++) {
+    if (i <= 0 || (!isPending && i > receipts!.totalPages)) continue;
+    pageButtonNumbers.push(i);
+  }
+
+  console.log(receipts);
 
   return (
     <div className="my-8 grid w-full grid-cols-7 gap-x-8">
@@ -55,24 +85,40 @@ const ReceiptsTable = () => {
           </div>
         ) : (
           <div>
-            <ReceiptsGrid receipts={receipts ?? []} />
+            <ReceiptsGrid receipts={receipts?.items ?? []} />
             <Pagination>
               <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="">2</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="">3</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="" />
-                </PaginationItem>
+                {page > 1 && (
+                  <>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href={`/receipts?page=${page - 1}&totalItems=${totalItems}`}
+                      />
+                    </PaginationItem>
+                    {pageButtonNumbers[0] !== 1 && <PaginationEllipsis />}
+                  </>
+                )}
+
+                {pageButtonNumbers.map((pageNumber) => (
+                  <PaginationItem key={pageNumber}>
+                    <PaginationLink
+                      href={`/receipts?page=${pageNumber}&totalItems=${totalItems}`}
+                    >
+                      {pageNumber}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                {!isPending && page < receipts!.totalPages && (
+                  <>
+                    {page + 2 < receipts!.totalPages && <PaginationEllipsis />}
+                    <PaginationItem>
+                      <PaginationNext
+                        href={`/receipts?page=${page + 1}&totalItems=${totalItems}`}
+                      />
+                    </PaginationItem>
+                  </>
+                )}
               </PaginationContent>
             </Pagination>
           </div>
@@ -181,7 +227,9 @@ const ReceiptsGrid = ({ receipts }: { receipts: ReceiptWithProducts[] }) => {
               </div>
             </div>
             <Separator orientation="horizontal" className="my-1" />
-            <div className="text-muted-foreground text-sm">PRODUCTS ({receipt.products.length})</div>
+            <div className="text-muted-foreground text-sm">
+              PRODUCTS ({receipt.products.length})
+            </div>
             <div className="my-3">
               {receipt.products.slice(0, 3).map((product) => (
                 <div key={product.id} className="text-sm">

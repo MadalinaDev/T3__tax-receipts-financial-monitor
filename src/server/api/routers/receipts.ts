@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { ReceiptsInsertSchema, ProductsInsertSchema } from "~/types/receipt";
 import { receipts } from "~/server/db/schema/receipts";
 import { products } from "~/server/db/schema/products";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, count } from "drizzle-orm";
 import type { ProductsTableType } from "~/server/db/schema/products";
 
 const PostReceiptDataSchema = z.object({
@@ -41,15 +41,17 @@ export const receiptsRouter = createTRPCRouter({
 
   get: protectedProcedure
     .input(z.object({
-      offset: z.number(),
-      limit: z.number(),
+      page: z.number(),
+      totalItems: z.number(),
     }))
     .query(async ({ ctx, input }) => {
+      const offset = (input.page - 1) * input.totalItems;
+      const limit = input.totalItems;
       const receiptsData = await ctx.db
         .select()
         .from(receipts)
-        .offset(input.offset)
-        .limit(input.limit)
+        .offset(offset)
+        .limit(limit)
         .where(eq(receipts.userId, ctx.session.user.id));
       const receiptsIds: string[] = [];
       receiptsData.forEach((receipt) => {
@@ -62,11 +64,18 @@ export const receiptsRouter = createTRPCRouter({
         productsByReceiptId[product.receiptId]!.push(product);
       }
 
-      const result = receiptsData.map((receipt) => ({
+      const items = receiptsData.map((receipt) => ({
         ...receipt,
         products: productsByReceiptId[receipt.id] ?? [],
       }))
 
-      return result;
+      const [totalCount] = await ctx.db.select({ count: count()}).from(receipts).where(eq(receipts.userId, ctx.session.user.id));
+      const totalPages = Math.ceil((totalCount?.count ?? 0) / limit);
+
+      return {
+        items,
+        totalCount: totalCount?.count,
+        totalPages,
+      };
     })
 });
