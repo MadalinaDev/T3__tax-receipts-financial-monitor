@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -21,6 +22,7 @@ import {
   SelectItem,
   SelectValue,
 } from "../ui/select";
+import { Slider } from "../ui/slider";
 
 const ReceiptsTable = () => {
   return (
@@ -53,6 +55,9 @@ const ReceiptsTable = () => {
 export default ReceiptsTable;
 
 const ReceiptsFilters = () => {
+
+  const [amountRange, setAmountRange] = useState<number[]>([200, 600]);
+
   return (
     <Card className="col-span-2 self-start">
       <CardHeader className="flex items-center justify-between">
@@ -68,31 +73,28 @@ const ReceiptsFilters = () => {
           <div className="mb-2">Date Range</div>
           <div className="flex w-full flex-row gap-2 font-semibold">
             <div className="flex-1 text-xs">
-              From
+              <div className="mb-1">From</div>
               <DatePicker />
             </div>
             <div className="flex-1 text-xs">
-              To
+              <div className="mb-1">To</div>
               <DatePicker />
             </div>
           </div>
         </div>
         <div className="my-6 text-xs font-semibold">
-          <div className="mb-2">Amount Range</div>
-          <div className="flex flex-row gap-2 font-semibold">
-            <div>
-              Min (MDL)
-              <Input type="number" placeholder="0.00" className="font-normal" />
-            </div>
-            <div className="text-xs">
-              Max(MDL)
-              <Input
-                type="number"
-                placeholder="999.99"
-                className="font-normal"
-              />
-            </div>
+          <div className="mb-4">Amount Range (MDL)</div>
+          <div className="text-muted-foreground text-xs flex justify-between items-center my-2">
+            <span>{amountRange[0]!}</span>
+            <span>{amountRange[1]!}</span>
           </div>
+          <Slider
+            defaultValue={[amountRange[0]!, amountRange[1]!]}
+            onValueChange={setAmountRange}
+            min={0}
+            max={1000}
+            step={1}
+          />
         </div>
         <div className="my-6 text-xs">
           <div className="mb-2 font-semibold">Sort By</div>
