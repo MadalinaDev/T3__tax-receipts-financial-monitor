@@ -50,7 +50,7 @@ function PaginationLink({
   ...props
 }: PaginationLinkProps) {
   return (
-    // @ts-ignore
+    // @ts-expect-error
     <Link
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
@@ -60,11 +60,11 @@ function PaginationLink({
           variant: isActive ? "outline" : "ghost",
           size,
         }),
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function PaginationPrevious({
