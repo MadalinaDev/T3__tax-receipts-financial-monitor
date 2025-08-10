@@ -50,7 +50,7 @@ function PaginationLink({
   ...props
 }: PaginationLinkProps) {
   return (
-    // @ts-expect-error
+    // @ts-expect-error unknown error cause but switched from <a> to <Link> for better performance
     <Link
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
