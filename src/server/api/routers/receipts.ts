@@ -3,6 +3,8 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { ReceiptsInsertSchema, ProductsInsertSchema } from "~/types/receipt";
 import { receipts } from "~/server/db/schema/receipts";
 import { products } from "~/server/db/schema/products";
+import { eq, inArray } from "drizzle-orm";
+import type { ProductsTableType } from "~/server/db/schema/products";
 
 const PostReceiptDataSchema = z.object({
   receipt: ReceiptsInsertSchema,
@@ -36,4 +38,35 @@ export const receiptsRouter = createTRPCRouter({
       }
       return;
     }),
+
+  get: protectedProcedure
+    .input(z.object({
+      offset: z.number(),
+      limit: z.number(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const receiptsData = await ctx.db
+        .select()
+        .from(receipts)
+        .offset(input.offset)
+        .limit(input.limit)
+        .where(eq(receipts.userId, ctx.session.user.id));
+      const receiptsIds: string[] = [];
+      receiptsData.forEach((receipt) => {
+        receiptsIds.push(receipt.id);
+      });
+      const productsData = await ctx.db.select().from(products).where(inArray(products.receiptId, receiptsIds));
+      const productsByReceiptId: Record<string, ProductsTableType[]> = {};
+      for (const product of productsData) {
+        if (!productsByReceiptId[product.receiptId]) productsByReceiptId[product.receiptId] = [];
+        productsByReceiptId[product.receiptId]!.push(product);
+      }
+
+      const result = receiptsData.map((receipt) => ({
+        ...receipt,
+        products: productsByReceiptId[receipt.id] ?? [],
+      }))
+
+      return result;
+    })
 });

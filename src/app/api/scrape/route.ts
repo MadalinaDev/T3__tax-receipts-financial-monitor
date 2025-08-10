@@ -7,7 +7,6 @@ const API_KEY = process.env.SCRAPER_API_KEY;
 // ---------- GET function for web scrapping the receipt data -----------------
 export async function GET(req: NextRequest) {
   try {
-    console.log("heeiiiii");
     const { searchParams } = new URL(req.url);
     const scrapeLink = searchParams.get("link");
     if (!scrapeLink) {
@@ -42,7 +41,6 @@ export async function GET(req: NextRequest) {
         status: 500,
       });
     }
-    console.log("sfsfsddf");
 
     // --------- extracting: --------------
     // ---------------------- COMPANY NAME, FISCAL CODE, ADDRESS, AND REGISTRATION NUMBER -------------
