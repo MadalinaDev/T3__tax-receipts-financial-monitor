@@ -58,7 +58,7 @@ export const receiptsRouter = createTRPCRouter({
       const productsData = await ctx.db.select().from(products).where(inArray(products.receiptId, receiptsIds));
       const productsByReceiptId: Record<string, ProductsTableType[]> = {};
       for (const product of productsData) {
-        if (!productsByReceiptId[product.receiptId]) productsByReceiptId[product.receiptId] = [];
+        productsByReceiptId[product.receiptId] ??= [];
         productsByReceiptId[product.receiptId]!.push(product);
       }
 

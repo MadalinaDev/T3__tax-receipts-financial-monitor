@@ -26,9 +26,6 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   }>();
   const { isLoaded, isSignedIn, user } = useUser();
 
-  if (!isLoaded) return null;
-  if (!isSignedIn) return null;
-
   useEffect(() => {
     setLoading(true);
     const scrapeByLink = async () => {
@@ -55,6 +52,9 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
     };
     void scrapeByLink();
   }, [scrapeLink]);
+
+  if (!isLoaded) return null;
+  if (!isSignedIn) return null;
 
   const saveReceiptData = api.receipts.create.useMutation({
     onSuccess: () => {
