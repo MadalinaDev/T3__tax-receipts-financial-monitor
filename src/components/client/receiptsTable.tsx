@@ -43,41 +43,59 @@ const ReceiptsTable = () => {
 
   let initialPage = +(searchParams.get("page") ?? DEFAULT_PAGE);
   if (initialPage < 1) initialPage = DEFAULT_PAGE;
-  let totalItems = +(searchParams.get("totalItems") ?? DEFAULT_TOTAL_ITEMS);
-  if (totalItems < 1) totalItems = DEFAULT_TOTAL_ITEMS;
-
-  const { data: receipts, isPending } = api.receipts.get.useQuery({
-    page: initialPage,
-    totalItems,
-  });
+  let initialTotalItems = +(
+    searchParams.get("totalItems") ?? DEFAULT_TOTAL_ITEMS
+  );
+  if (initialTotalItems < 1) initialTotalItems = DEFAULT_TOTAL_ITEMS;
 
   const router = useRouter();
   const [page, setPage] = useState<number>(initialPage);
+  const [totalItems, setTotalItems] = useState<number>(initialTotalItems);
+
+  const { data: receipts, isPending } = api.receipts.get.useQuery({
+    page,
+    totalItems,
+  });
+
+  const totalPages = Math.ceil((receipts?.totalCount ?? 0) / totalItems);
 
   useEffect(() => {
-    if (receipts && page > receipts.totalPages) {
-      setPage(receipts.totalPages);
-      router.replace(
-        `/receipts?page=${receipts.totalPages}&totalItems=${totalItems}`,
-      );
+    if (!receipts) return;
+    if (page > totalPages) {
+      setPage(totalPages);
+      router.replace(`/receipts?page=${totalPages}&totalItems=${totalItems}`);
+      return;
     }
-  }, [receipts, page, initialPage, totalItems]);
+    router.replace(`/receipts?page=${page}&totalItems=${totalItems}`);
+  }, [receipts, page, totalItems]);
 
   const pageButtonNumbers: number[] = [];
   for (let i = page - 2; i <= page + 2; i++) {
-    if (i <= 0 || (!isPending && i > receipts!.totalPages)) continue;
+    if (i <= 0 || (!isPending && i > totalPages)) continue;
     pageButtonNumbers.push(i);
   }
-
-  console.log(receipts);
 
   return (
     <div className="my-8 grid w-full grid-cols-7 gap-x-8">
       <ReceiptsFilters />
       <div className="col-span-5">
-        <div className="relative">
-          <Search className="absolute top-3 left-3 size-4" />
-          <Input placeholder="Search receipts..." className="pl-9" />
+        <div className="flex flex-row gap-2">
+          <div className="relative flex-11">
+            <Search className="absolute top-3 left-3 size-4" />
+            <Input placeholder="Search receipts..." className="pl-9" />
+          </div>
+          <Select onValueChange={(value) => setTotalItems(Number(value))}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder={`${DEFAULT_TOTAL_ITEMS} items`}/>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">1 items</SelectItem>
+              <SelectItem value="3">3 items</SelectItem>
+              <SelectItem value="6">6 items</SelectItem>
+              <SelectItem value="9">9 items</SelectItem>
+              <SelectItem value="12">12 items</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         {isPending ? (
           <div className="my-[15%] w-full">
@@ -93,6 +111,7 @@ const ReceiptsTable = () => {
                     <PaginationItem>
                       <PaginationPrevious
                         href={`/receipts?page=${page - 1}&totalItems=${totalItems}`}
+                        onClick={() => setPage(page - 1)}
                       />
                     </PaginationItem>
                     {pageButtonNumbers[0] !== 1 && <PaginationEllipsis />}
@@ -103,18 +122,20 @@ const ReceiptsTable = () => {
                   <PaginationItem key={pageNumber}>
                     <PaginationLink
                       href={`/receipts?page=${pageNumber}&totalItems=${totalItems}`}
+                      onClick={() => setPage(pageNumber)}
                     >
                       {pageNumber}
                     </PaginationLink>
                   </PaginationItem>
                 ))}
 
-                {!isPending && page < receipts!.totalPages && (
+                {!isPending && page < totalPages && (
                   <>
-                    {page + 2 < receipts!.totalPages && <PaginationEllipsis />}
+                    {page + 2 < totalPages && <PaginationEllipsis />}
                     <PaginationItem>
                       <PaginationNext
                         href={`/receipts?page=${page + 1}&totalItems=${totalItems}`}
+                        onClick={() => setPage(page + 1)}
                       />
                     </PaginationItem>
                   </>

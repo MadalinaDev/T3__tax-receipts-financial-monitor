@@ -70,12 +70,10 @@ export const receiptsRouter = createTRPCRouter({
       }))
 
       const [totalCount] = await ctx.db.select({ count: count()}).from(receipts).where(eq(receipts.userId, ctx.session.user.id));
-      const totalPages = Math.ceil((totalCount?.count ?? 0) / limit);
 
       return {
         items,
         totalCount: totalCount?.count,
-        totalPages,
       };
     })
 });
