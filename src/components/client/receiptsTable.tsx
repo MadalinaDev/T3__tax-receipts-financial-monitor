@@ -61,7 +61,7 @@ const ReceiptsTable = () => {
         `/receipts?page=${receipts.totalPages}&totalItems=${totalItems}`,
       );
     }
-  }, [receipts]);
+  }, [receipts, page, initialPage, totalItems]);
 
   const pageButtonNumbers: number[] = [];
   for (let i = page - 2; i <= page + 2; i++) {
