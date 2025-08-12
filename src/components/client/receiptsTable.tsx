@@ -64,10 +64,10 @@ const ReceiptsTable = () => {
 
   useEffect(() => {
     if (!receipts) return;
-    if (page > totalPages) setPage(DEFAULT_PAGE);
-    if (totalItems > receipts.totalCount!) setTotalItems(DEFAULT_TOTAL_ITEMS);
-    if (page < 1) setPage(DEFAULT_PAGE);
-    if (totalItems < 1) setTotalItems(DEFAULT_TOTAL_ITEMS);
+    if (page > totalPages) void setPage(DEFAULT_PAGE);
+    if (totalItems > receipts.totalCount!) void setTotalItems(DEFAULT_TOTAL_ITEMS);
+    if (page < 1) void setPage(DEFAULT_PAGE);
+    if (totalItems < 1) void setTotalItems(DEFAULT_TOTAL_ITEMS);
   }, [receipts, page, totalItems, currentSearch]);
 
   const pageButtonNumbers: number[] = [];
