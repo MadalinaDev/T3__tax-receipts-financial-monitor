@@ -12,10 +12,10 @@ export default function RootLayout({
     <ClerkProvider>
       <TRPCReactProvider>
         <html lang="en">
-          <body>
+          <body className="font-custom tracking-wide text-navy-blue">
             <HydrateClient>
               <Header />
-              <div className="md:mx-36 mx-8 text-muted-foregroud!">{children}</div>
+              <div className="md:mx-36 mx-8">{children}</div>
               {/* <Footer /> */}
             </HydrateClient>
           </body>
