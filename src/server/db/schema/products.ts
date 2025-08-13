@@ -4,7 +4,6 @@ import {
   uuid,
   text,
   timestamp,
-  integer,
   numeric,
 } from "drizzle-orm/pg-core";
 import { receipts } from "./receipts";

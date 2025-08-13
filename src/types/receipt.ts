@@ -24,6 +24,7 @@ export interface ReceiptType {
 // ------------------- interfaces and schemas for receipts / products table according to db ------------------------
 export const ReceiptsInsertSchema = z.object({
   url: z.string(),
+  userId: z.string(),
   dateTime: z.date(),
   location: z.string(),
   total: z.string(),
@@ -43,3 +44,10 @@ export const ProductsInsertSchema = z.object({
 });
 
 export type ProductsInsert = z.infer<typeof ProductsInsertSchema>;
+
+// ------------------------------- get method for receipts with products ---------------------------------------------------------
+import type { ReceiptsTableType } from "~/server/db/schema/receipts";
+import type { ProductsTableType } from "~/server/db/schema/products";
+export type ReceiptWithProducts = ReceiptsTableType & {
+  products: ProductsTableType[];
+};

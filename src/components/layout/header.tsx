@@ -37,7 +37,7 @@ const Header = () => {
             <UserButton
               appearance={{
                 elements: {
-                  userButtonAvatarBox: "w-10 h-10 ring-2 ring-gray-500 md: my-0 my-2",
+                  userButtonAvatarBox: "w-10 h-10 ring-2 ring-gray-500",
                 },
               }}
             />
