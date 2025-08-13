@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Andada+Pro:ital,wght@0,400..840;1,400..840&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Andada+Pro:ital,wght@0,400..840;1,400..840&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -46,6 +46,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-custom: var(--custom);
   --color-navy-blue: var(--navy-blue);
+  --color-muted-navy-blue: var(--muted-navy-blue);
   --color-yellow: var(--yellow);
 }
 
@@ -84,6 +85,7 @@
   --foreground: oklch(0.145 0 0);
   --custom: oklch(0.8329 0.2325 304.84);
   --navy-blue: #11144c;
+  --muted-navy-blue: #2a2d70;
   --yellow: #fabc60;
 }
 
@@ -121,6 +123,7 @@
   --sidebar-ring: oklch(0.556 0 0);
   --custom: oklch(0.8329 0.2325 304.84);
   --navy-blue: #11144c;
+  --muted-navy-blue: #2a2d70;
   --yellow: #fabc60;
 }
 
