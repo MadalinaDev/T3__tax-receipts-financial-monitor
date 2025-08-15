@@ -170,7 +170,7 @@ const Home = () => {
       </section>
 
       {/* Steps Section */}
-      <section className="-mx-8 mb-24 bg-white px-6 py-6 shadow-[0_-7px_6px_#00000013,0_7px_6px_#00000013] md:-mx-36 md:px-12 md:py-12">
+      <section className="-mx-8 mb-24 bg-white py-6 shadow-[0_-7px_6px_#00000013,0_7px_6px_#00000013] md:-mx-36 md:py-12">
         <h2 className="my-2 text-center text-2xl font-semibold lg:text-4xl">
           Get Financial Clarity in 3 Simple Steps
         </h2>

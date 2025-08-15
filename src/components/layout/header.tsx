@@ -30,10 +30,10 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 flex flex-col shadow-[0_3px_6px_-1px_#e5e7eb] bg-white/80 z-100">
-      <nav className="text-md flex flex-col items-center justify-between gap-x-4 px-12 py-4 md:flex-row md:gap-x-12 md:px-36">
+    <header className="sticky top-0 z-100 flex flex-col bg-white/80 shadow-[0_3px_6px_-1px_#e5e7eb]">
+      <nav className="text-md mx-auto flex max-w-[1580px] flex-col items-center justify-between gap-x-4 px-8 py-4 md:flex-row md:gap-x-12 md:px-36 w-full">
         <Link href="/">
-          <Image src="/logo.png" alt="ReceiptIQ logo" width={120} height={28} />
+          <Image src="/logo.png" alt="ReceiptIQ logo" width={120} height={28}/>
         </Link>
 
         <div className="my-3 flex flex-col gap-4 md:my-0 md:flex-row md:gap-12">
@@ -62,7 +62,7 @@ const Header = () => {
               <SignUpButton>
                 <Button
                   size="sm"
-                  className="bg-navy-blue ml-2 cursor-pointer px-4 text-white md:ml-4"
+                  className="bg-navy-blue hover:bg-black ml-2 cursor-pointer px-4 text-white md:ml-4"
                 >
                   Sign Up
                 </Button>
