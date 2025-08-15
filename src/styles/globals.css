@@ -1,11 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Andada+Pro:ital,wght@0,400..840;1,400..840&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-custom: "Andada Pro", "serif";
 }
 
 @theme inline {
@@ -44,6 +44,10 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-custom: var(--custom);
+  --color-navy-blue: var(--navy-blue);
+  --color-muted-navy-blue: var(--muted-navy-blue);
+  --color-yellow: var(--yellow);
 }
 
 :root {
@@ -79,6 +83,10 @@
   --sidebar-ring: oklch(0.708 0 0);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  --custom: oklch(0.8329 0.2325 304.84);
+  --navy-blue: #11144c;
+  --muted-navy-blue: #2a2d70;
+  --yellow: #fabc60;
 }
 
 .dark {
@@ -86,7 +94,7 @@
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(20.022% 0.027 19.674);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
@@ -113,6 +121,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --custom: oklch(0.8329 0.2325 304.84);
+  --navy-blue: #11144c;
+  --muted-navy-blue: #2a2d70;
+  --yellow: #fabc60;
 }
 
 @layer base {
