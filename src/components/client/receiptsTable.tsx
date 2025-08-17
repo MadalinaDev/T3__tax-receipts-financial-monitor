@@ -277,8 +277,8 @@ const ReceiptsFilters = ({
           <Slider
             defaultValue={[amountStart, amountEnd]}
             onValueChange={(values) => {
-              values[0] && setAmountStart(values[0]);
-              values[1] && setAmountEnd(values[1]);
+              if (values[0] !== undefined) setAmountStart(values[0]);
+              if (values[1] !== undefined) setAmountEnd(values[1]);
             }}
             min={0}
             max={1000}
