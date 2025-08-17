@@ -6,6 +6,7 @@ export const receipts = pgTable("receipts", {
     .default(sql`gen_random_uuid()`)
     .primaryKey(),
   url: text("url").notNull(),
+  userId: text("user_id").notNull(),
   dateTime: timestamp("date_time", { withTimezone: true }).notNull(),
   location: text("location").notNull(),
   total: numeric("total", { precision: 10, scale: 2 }).notNull(),

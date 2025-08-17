@@ -14,6 +14,8 @@ import type { ReceiptType } from "~/types/receipt";
 import { api } from "~/trpc/react";
 import { type ProductsInsert } from "~/types/receipt";
 import Link from "next/link";
+import { useUser } from "@clerk/clerk-react";
+import Upload from "./upload";
 
 const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   const [loading, setLoading] = useState<boolean | null>(null);
@@ -23,6 +25,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
     success: boolean;
     message: string;
   }>();
+  const { isLoaded, isSignedIn, user } = useUser();
 
   useEffect(() => {
     setLoading(true);
@@ -50,6 +53,9 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
     };
     void scrapeByLink();
   }, [scrapeLink]);
+
+  if (!isLoaded) return null;
+  if (!isSignedIn) return null;
 
   const saveReceiptData = api.receipts.create.useMutation({
     onSuccess: () => {
@@ -80,8 +86,13 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
       );
       return;
     }
+    if (!user) {
+      console.error("Client-side error: no user signed in.");
+      return;
+    }
 
     const formattedReceipt = {
+      userId: user.id,
       url: scrapeLink,
       dateTime: new Date(receiptData.dateTime),
       location: receiptData.company.address,
@@ -108,6 +119,8 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
     });
   };
 
+  if (!scrapeLink) return <Upload />;
+
   return (
     <div>
       {confirmationMessage ? (
@@ -120,11 +133,11 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
             )}
             {confirmationMessage.message}
           </div>
-          <div className="mt-4 flex justify-center text-muted-foreground">
-            <Link href={confirmationMessage.success ? "/statistics" : "/"}>
+          <div className="text-muted-foreground mt-4 flex justify-center">
+            <Link href={confirmationMessage.success ? "/receipts" : "/"}>
               <Button variant="outline" className="mx-auto px-6">
                 {confirmationMessage.success
-                  ? "Check out your statistics"
+                  ? "Check out your receipts"
                   : "Go to main page"}
                 <MoveRight className="size-8 md:size-6" />
               </Button>

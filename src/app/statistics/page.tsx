@@ -1,5 +1,7 @@
+import UnderConstruction from "~/components/layout/underConstruction";
+
 const StatisticsPage = () => {
-  return <div>This is your statistics page.</div>;
+  return <UnderConstruction />;
 };
 
 export default StatisticsPage;
