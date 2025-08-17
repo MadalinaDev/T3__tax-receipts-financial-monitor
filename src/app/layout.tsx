@@ -28,17 +28,19 @@ export default function RootLayout({
       <TRPCReactProvider>
         <html lang="en">
           <body
-            className={`${montserrat.variable} ${openSans.variable} antialiased text-navy-blue`}
+            className={`${montserrat.variable} ${openSans.variable} text-navy-blue antialiased`}
           >
-                        <NuqsAdapter>
-
-            <HydrateClient>
-              <Header />
-              <div className="px-8 md:px-36 mx-auto max-w-[1580px]">{children}</div>
-              <Footer />
-            </HydrateClient>
-                        </NuqsAdapter>
-
+            <NuqsAdapter>
+              <HydrateClient>
+                <div className="flex min-h-screen flex-col">
+                  <Header />
+                  <div className="mx-auto max-w-[1580px] flex-1 px-8 md:px-36">
+                    {children}
+                  </div>
+                  <Footer />
+                </div>
+              </HydrateClient>
+            </NuqsAdapter>
           </body>
         </html>
       </TRPCReactProvider>
