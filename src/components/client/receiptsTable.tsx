@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardContent, CardFooter } from "../ui/card";
+import { useEffect } from "react";
+import { Card, CardHeader, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
@@ -37,9 +37,11 @@ import { parseAsInteger, useQueryState } from "nuqs";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_TOTAL_ITEMS = 3;
+const DEFAULT_AMOUNT_START = 0;
+const DEFAULT_AMOUNT_END = 800;
+type SortByType = "date-desc" | "date-asc" | "amount-asc" | "amount-desc";
 
 const ReceiptsTable = () => {
-
   // -------- nuqs state management for URL params -------------
   const [currentSearch, setCurrentSearch] = useQueryState("search", {
     defaultValue: "",
@@ -52,12 +54,39 @@ const ReceiptsTable = () => {
     "totalItems",
     parseAsInteger.withDefault(DEFAULT_TOTAL_ITEMS),
   );
+  const [dateStart, setDateStart] = useQueryState("dateStart", {
+    defaultValue: "",
+  });
+  const [dateEnd, setDateEnd] = useQueryState("dateEnd", {
+    defaultValue: "",
+  });
+  const [amountStart, setAmountStart] = useQueryState(
+    "amountStart",
+    parseAsInteger.withDefault(DEFAULT_AMOUNT_START),
+  );
+  const [amountEnd, setAmountEnd] = useQueryState(
+    "amountEnd",
+    parseAsInteger.withDefault(DEFAULT_AMOUNT_END),
+  );
+ const [sortBy, setSortBy] = useQueryState<SortByType>("sortBy", {
+   parse: (v) =>
+    v === "date-desc" || v === "date-asc" || v === "amount-asc" || v === "amount-desc"
+      ? v
+      : "date-desc",
+ });
   // -------------------------------------------------------------
 
   const { data: receipts, isPending } = api.receipts.get.useQuery({
     page,
     totalItems,
     search: currentSearch,
+    filters: {
+      dateStart,
+      dateEnd,
+      amountStart,
+      amountEnd,
+    },
+    sortBy,
   });
 
   const totalPages = Math.ceil((receipts?.totalCount ?? 0) / totalItems);
@@ -65,9 +94,12 @@ const ReceiptsTable = () => {
   useEffect(() => {
     if (!receipts) return;
     if (page > totalPages) void setPage(DEFAULT_PAGE);
-    if (totalItems > receipts.totalCount!) void setTotalItems(DEFAULT_TOTAL_ITEMS);
+    if (totalItems > receipts.totalCount!)
+      void setTotalItems(DEFAULT_TOTAL_ITEMS);
     if (page < 1) void setPage(DEFAULT_PAGE);
     if (totalItems < 1) void setTotalItems(DEFAULT_TOTAL_ITEMS);
+    // TO DO: add some limits in the interaction of the user with the filters 
+    // that can be doen throguh the URL manipulation
   }, [receipts, page, totalItems, currentSearch]);
 
   const pageButtonNumbers: number[] = [];
@@ -78,7 +110,18 @@ const ReceiptsTable = () => {
 
   return (
     <div className="my-8 grid w-full grid-cols-7 gap-x-8">
-      <ReceiptsFilters />
+      <ReceiptsFilters
+        dateStart={dateStart}
+        setDateStart={setDateStart}
+        dateEnd={dateEnd}
+        setDateEnd={setDateEnd}
+        amountStart={amountStart}
+        setAmountStart={setAmountStart}
+        amountEnd={amountEnd}
+        setAmountEnd={setAmountEnd}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
       <div className="col-span-5">
         <div className="flex flex-row gap-2">
           <div className="relative flex-11">
@@ -89,7 +132,10 @@ const ReceiptsTable = () => {
               value={currentSearch}
               onChange={(e) => setCurrentSearch(e.target.value)}
             />
-            <X className="absolute right-3 top-3 size-4 hover:cursor-pointer" onClick={() => setCurrentSearch("")}/>
+            <X
+              className="absolute top-3 right-3 size-4 hover:cursor-pointer"
+              onClick={() => setCurrentSearch("")}
+            />
           </div>
           <Select onValueChange={(value) => setTotalItems(Number(value))}>
             <SelectTrigger className="flex-1">
@@ -165,8 +211,37 @@ const ReceiptsTable = () => {
 
 export default ReceiptsTable;
 
-const ReceiptsFilters = () => {
-  const [amountRange, setAmountRange] = useState<number[]>([200, 600]);
+const ReceiptsFilters = ({
+  dateStart,
+  dateEnd,
+  setDateStart,
+  setDateEnd,
+  amountStart,
+  setAmountStart,
+  amountEnd,
+  setAmountEnd,
+  sortBy,
+  setSortBy,
+}: {
+  dateStart: string;
+  dateEnd: string;
+  setDateStart: (date: string) => void;
+  setDateEnd: (date: string) => void;
+  amountStart: number;
+  setAmountStart: (amount: number) => void;
+  amountEnd: number;
+  setAmountEnd: (amount: number) => void;
+  sortBy: SortByType | null;
+  setSortBy: (by: SortByType | null) => void;
+}) => {
+
+  const clearAllFilters = () => {
+    setDateStart("");
+    setDateEnd("");
+    setAmountStart(DEFAULT_AMOUNT_START);
+    setAmountEnd(DEFAULT_AMOUNT_END);
+    setSortBy("date-desc");
+  }
 
   return (
     <Card className="col-span-2 self-start">
@@ -174,7 +249,7 @@ const ReceiptsFilters = () => {
         <div className="flex flex-row items-center gap-x-2">
           <ListFilter className="size-5" /> Filters
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={clearAllFilters}>
           Clear All
         </Button>
       </CardHeader>
@@ -184,48 +259,50 @@ const ReceiptsFilters = () => {
           <div className="flex w-full flex-row gap-2 font-semibold">
             <div className="flex-1 text-xs">
               <div className="mb-1">From</div>
-              <DatePicker />
+              <DatePicker value={dateStart} setValue={setDateStart} />
             </div>
             <div className="flex-1 text-xs">
               <div className="mb-1">To</div>
-              <DatePicker />
+              <DatePicker value={dateEnd} setValue={setDateEnd} />
             </div>
           </div>
         </div>
         <div className="my-6 text-xs font-semibold">
           <div className="mb-4">Amount Range (MDL)</div>
           <div className="text-muted-foreground my-2 flex items-center justify-between text-xs">
-            <span>{amountRange[0]!}</span>
-            <span>{amountRange[1]!}</span>
+            <span>{amountStart}</span>
+            <span>{amountEnd}</span>
           </div>
+          {/* TO DO: ADD A DEBOUNCER TO THIS SLIDER */}
           <Slider
-            defaultValue={[amountRange[0]!, amountRange[1]!]}
-            onValueChange={setAmountRange}
+            defaultValue={[amountStart, amountEnd]}
+            onValueChange={(values) => {
+              values[0] && setAmountStart(values[0]);
+              values[1] && setAmountEnd(values[1]);
+            }}
             min={0}
             max={1000}
-            step={1}
+            step={10}
           />
         </div>
         <div className="my-6 text-xs">
           <div className="mb-2 font-semibold">Sort By</div>
-          <Select>
+          <Select
+            value={sortBy ?? undefined}
+            onValueChange={(v) => setSortBy(v as SortByType)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Date (Newest)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">Date (Newest)</SelectItem>
-              <SelectItem value="oldest">Date (Oldest)</SelectItem>
-              <SelectItem value="high">Amount (High to Low)</SelectItem>
-              <SelectItem value="low">Amount (Low to High)</SelectItem>
+              <SelectItem value="date-desc">Date (Newest)</SelectItem>
+              <SelectItem value="date-asc">Date (Oldest)</SelectItem>
+              <SelectItem value="amount-desc">Amount (High to Low)</SelectItem>
+              <SelectItem value="amount-asc">Amount (Low to High)</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" size="sm" className="w-full">
-          Apply
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

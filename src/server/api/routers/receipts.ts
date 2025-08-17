@@ -46,6 +46,15 @@ export const receiptsRouter = createTRPCRouter({
         page: z.number(),
         totalItems: z.number(),
         search: z.string().nullable(),
+        filters: z
+          .object({
+            dateStart: z.string().nullable(),
+            dateEnd: z.string().nullable(),
+            amountStart: z.number().nullable(),
+            amountEnd: z.number().nullable(),
+          })
+          .nullable(),
+        sortBy: z.enum(["date-desc", "date-asc", "amount-asc", "amount-desc"]).nullable(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -61,9 +70,48 @@ export const receiptsRouter = createTRPCRouter({
             ilike(receipts.companyName, `%${input.search}%`),
           )
         : undefined;
+
+      const dateClause = input.filters
+        ? and(
+            input.filters.dateStart
+              ? sql`${receipts.dateTime} >= ${new Date(input.filters.dateStart).toISOString()}`
+              : undefined,
+            input.filters.dateEnd
+              ? sql`${receipts.dateTime} <= ${new Date(input.filters.dateEnd).toISOString()}`
+              : undefined,
+          )
+        : undefined;
+
+      const amountClause = input.filters
+      ? and(
+        input.filters.amountStart
+        ? sql`${receipts.total} >= ${input.filters.amountStart}` :undefined,
+        input.filters.amountEnd ? sql`${receipts.total} <= ${input.filters.amountEnd}` : undefined
+      ) : undefined;
+
+      let orderByClause;
+      switch (input.sortBy) {
+        case "date-desc":
+          orderByClause = sql`${receipts.dateTime} DESC`;
+          break;
+        case "date-asc":
+          orderByClause = sql`${receipts.dateTime} ASC`;
+          break;
+        case "amount-asc":
+          orderByClause = sql`${receipts.total} ASC`;
+          break;
+        case "amount-desc":
+          orderByClause = sql`${receipts.total} DESC`;
+          break;
+        default:
+          orderByClause = sql`${receipts.dateTime} DESC`; // default sorting
+      }
+
       const whereClause = and(
         eq(receipts.userId, ctx.session.user.id),
         searchClause,
+        dateClause,
+        amountClause
       );
 
       const receiptsData = await ctx.db
@@ -71,7 +119,8 @@ export const receiptsRouter = createTRPCRouter({
         .from(receipts)
         .offset(offset)
         .limit(limit)
-        .where(whereClause);
+        .where(whereClause)
+        .orderBy(orderByClause);
       const receiptsIds: string[] = [];
       receiptsData.forEach((receipt) => {
         receiptsIds.push(receipt.id);
