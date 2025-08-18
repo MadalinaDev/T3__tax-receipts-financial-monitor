@@ -26,7 +26,7 @@ const Upload = () => {
   };
 
   return (
-    <div className="mx-2 my-2 md:mx-72 md:my-12">
+    <div className="mx-auto my-2 md:my-12 md:min-w-2xl">
       <div className="my-10 text-center">
         <p className="text-lg font-semibold">Upload your receipt</p>
         <p className="text-md">
@@ -55,7 +55,7 @@ const Upload = () => {
             onClick={() => {
               if (link) processScrapeByLink();
             }}
-            className="bg-navy-blue hover:bg-navy-blue/60 my-2 w-full"
+            className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
           >
             Process
           </Button>
@@ -70,7 +70,10 @@ const Upload = () => {
               </div>
             </CardContent>
           </Card>
-          <Button variant="default" className="my-2 w-full">
+          <Button
+            variant="default"
+            className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
+          >
             Process
           </Button>
         </TabsContent>
@@ -115,7 +118,9 @@ const Upload = () => {
               <Input id="issue-date" type="date" />
             </div>
           </div>
-          <Button className="my-2 w-full">Process</Button>
+          <Button className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full">
+            Process
+          </Button>
         </TabsContent>
       </Tabs>
 

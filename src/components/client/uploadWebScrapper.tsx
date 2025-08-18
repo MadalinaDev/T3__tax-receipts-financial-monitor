@@ -33,7 +33,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
         const response = await fetch(
-          `${baseUrl}api/scrape?link=${scrapeLink}`,
+          `${baseUrl}api/scrape?link=${scrapeLink}&ultra_premium=true`,
           {
             method: "GET",
             headers: {
@@ -124,8 +124,8 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   return (
     <div>
       {confirmationMessage ? (
-        <div className="my-48">
-          <div className="text-muted-foreground flex flex-row items-center justify-center gap-4">
+        <div className="text-navy-blue my-48">
+          <div className="text-navy-blue flex flex-row items-center justify-center gap-4">
             {confirmationMessage.success ? (
               <PartyPopper className="size-8 md:size-6" />
             ) : (
@@ -133,7 +133,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
             )}
             {confirmationMessage.message}
           </div>
-          <div className="text-muted-foreground mt-4 flex justify-center">
+          <div className="text-navy-blue mt-4 flex justify-center">
             <Link href={confirmationMessage.success ? "/receipts" : "/"}>
               <Button variant="outline" className="mx-auto px-6">
                 {confirmationMessage.success
@@ -145,11 +145,11 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
           </div>
         </div>
       ) : loading !== false || startedConfirm ? (
-        <div className="my-[15%] w-full">
+        <div className="flex min-h-[40vh] w-full items-center justify-center">
           <Loader2 className="mx-auto animate-spin" />
         </div>
       ) : receiptData ? (
-        <div>
+        <div className="text-navy-blue">
           <div className="mx-auto mt-12 mb-6 flex flex-row items-start justify-center gap-4 md:gap-6">
             <Check className="size-8 md:size-6" />
             <div>
@@ -161,7 +161,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
           <Receipt receiptData={receiptData} />
           <Button
             variant="outline"
-            className="mx-auto my-6 block"
+            className="mx-auto my-6 md:mb-12 block"
             onClick={handleSaveReceiptData}
           >
             <div className="flex flex-row gap-2 px-6">

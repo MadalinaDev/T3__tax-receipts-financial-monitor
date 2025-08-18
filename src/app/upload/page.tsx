@@ -1,5 +1,6 @@
 // import Upload from "~/components/client/upload";
 import UploadWebScrapper from "~/components/client/uploadWebScrapper";
+import Upload from "~/components/client/upload";
 
 export default async function UploadPage({
   searchParams,
@@ -8,8 +9,6 @@ export default async function UploadPage({
 }) {
   const { scrapeLink } = await searchParams;
 
-  // if (scrapeLink) return <UploadWebScrapper scrapeLink={scrapeLink} />;
-  // return <Upload />;
-  
-  return <UploadWebScrapper scrapeLink={scrapeLink} />;
+  if (scrapeLink) return <UploadWebScrapper scrapeLink={scrapeLink} />;
+  return <Upload />;
 }
