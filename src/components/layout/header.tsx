@@ -42,17 +42,11 @@ const Header = () => {
 
         {/* ------------- mobile menu btn -------------- */}
         {!isOpen ? (
-          <button
-            onClick={() => setIsOpen(true)}
-            className="md:hidden"
-          >
+          <button onClick={() => setIsOpen(true)} className="md:hidden">
             <Menu className="text-navy-blue size-6" />
           </button>
         ) : (
-          <button
-            onClick={() => setIsOpen(false)}
-            className="md:hidden"
-          >
+          <button onClick={() => setIsOpen(false)} className="md:hidden">
             <X className="text-navy-blue size-6" />
           </button>
         )}
@@ -69,7 +63,7 @@ const Header = () => {
           ref={menuRef}
           className="flex flex-col items-center justify-center gap-2 md:hidden"
         >
-          <NavLinks />
+          <NavLinks closeMenu={() => setIsOpen(false)} />
           <UserButtons />
         </nav>
       )}
@@ -77,7 +71,7 @@ const Header = () => {
   );
 };
 
-const NavLinks = () => {
+const NavLinks = ({ closeMenu }: {closeMenu?: () => void}) => {
   const headerButtons = [
     {
       id: "upload",
@@ -100,7 +94,7 @@ const NavLinks = () => {
     <>
       {headerButtons.map((item) => (
         <Link key={item.id} href={item.path} prefetch={false}>
-          <div className="group relative px-2">
+          <div className="group relative px-2" onClick={closeMenu}>
             <span className="group-hover:text-yellow duration-200 group-hover:duration-300">
               {item.title}
             </span>

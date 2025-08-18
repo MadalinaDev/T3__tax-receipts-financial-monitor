@@ -6,7 +6,7 @@ const ReceiptsPage = () => {
   return (
     <Suspense
       fallback={
-        <div className="my-[15%] w-full">
+        <div className="min-h-[40vh] flex flex-col justify-center items-center w-full">
           <Loader2 className="mx-auto animate-spin" />
         </div>
       }

@@ -18,7 +18,7 @@ export function DatePicker({ value, setValue }: { value: string, setValue: (date
         <Button
           variant="outline"
           data-empty={!value}
-          className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
+          className="data-[empty=true]:text-muted-navy-blue w-full justify-start text-left font-normal"
         >
           <CalendarIcon />
           {value ? (

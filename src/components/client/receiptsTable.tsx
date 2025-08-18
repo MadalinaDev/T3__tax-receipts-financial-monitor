@@ -109,7 +109,7 @@ const ReceiptsTable = () => {
   }
 
   return (
-    <div className="my-8 grid w-full grid-cols-7 gap-x-8">
+    <div className="my-8 grid grid-cols-1 md:grid-cols-7 md:gap-x-8 w-full">
       <ReceiptsFilters
         dateStart={dateStart}
         setDateStart={setDateStart}
@@ -122,13 +122,13 @@ const ReceiptsTable = () => {
         sortBy={sortBy}
         setSortBy={setSortBy}
       />
-      <div className="col-span-5">
+      <div className="md:col-span-5">
         <div className="flex flex-row gap-2">
           <div className="relative flex-11">
             <Search className="absolute top-3 left-3 size-4" />
             <Input
               placeholder="Search receipts..."
-              className="pl-9"
+              className="text-muted-navy-blue pl-9"
               value={currentSearch}
               onChange={(e) => setCurrentSearch(e.target.value)}
             />
@@ -141,7 +141,7 @@ const ReceiptsTable = () => {
             <SelectTrigger className="flex-1">
               <SelectValue placeholder={`${DEFAULT_TOTAL_ITEMS} items`} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="text-muted-navy-blue">
               <SelectItem value="1">1 items</SelectItem>
               <SelectItem value="3">3 items</SelectItem>
               <SelectItem value="6">6 items</SelectItem>
@@ -244,17 +244,22 @@ const ReceiptsFilters = ({
   }
 
   return (
-    <Card className="col-span-2 self-start">
+    <Card className="mb-12 md:col-span-2 md:self-start w-xs">
       <CardHeader className="flex items-center justify-between">
-        <div className="flex flex-row items-center gap-x-2">
+        <div className="text-navy-blue flex flex-row items-center gap-x-2">
           <ListFilter className="size-5" /> Filters
         </div>
-        <Button variant="outline" size="sm" onClick={clearAllFilters}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-muted-navy-blue/70"
+          onClick={clearAllFilters}
+        >
           Clear All
         </Button>
       </CardHeader>
-      <CardContent>
-        <div className="my-6 text-xs font-semibold">
+      <CardContent className="text-navy-blue">
+        <div className="text-navy-blue my-6 text-xs font-semibold">
           <div className="mb-2">Date Range</div>
           <div className="flex w-full flex-row gap-2 font-semibold">
             <div className="flex-1 text-xs">
@@ -267,9 +272,9 @@ const ReceiptsFilters = ({
             </div>
           </div>
         </div>
-        <div className="my-6 text-xs font-semibold">
+        <div className="text-navy-blue my-6 text-xs font-semibold">
           <div className="mb-4">Amount Range (MDL)</div>
-          <div className="text-muted-foreground my-2 flex items-center justify-between text-xs">
+          <div className="text-navy-blue my-2 flex items-center justify-between text-xs">
             <span>{amountStart}</span>
             <span>{amountEnd}</span>
           </div>
@@ -283,9 +288,10 @@ const ReceiptsFilters = ({
             min={0}
             max={1000}
             step={10}
+            className=""
           />
         </div>
-        <div className="my-6 text-xs">
+        <div className="text-navy-blue my-6 text-xs">
           <div className="mb-2 font-semibold">Sort By</div>
           <Select
             value={sortBy ?? undefined}
@@ -294,7 +300,7 @@ const ReceiptsFilters = ({
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Date (Newest)" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="text-muted-navy-blue">
               <SelectItem value="date-desc">Date (Newest)</SelectItem>
               <SelectItem value="date-asc">Date (Oldest)</SelectItem>
               <SelectItem value="amount-desc">Amount (High to Low)</SelectItem>
@@ -309,13 +315,13 @@ const ReceiptsFilters = ({
 
 const ReceiptsGrid = ({ receipts }: { receipts: ReceiptWithProducts[] }) => {
   return (
-    <div className="my-6 grid grid-cols-3 gap-6">
+    <div className="text-navy-blue my-6 grid grid-cols-1 md:grid-cols-3 gap-6">
       {receipts.map((receipt) => (
         <Card
           key={receipt.id}
           className="flex h-full cursor-pointer flex-col transition-shadow hover:shadow-md"
         >
-          <CardHeader className="flex justify-between">
+          <CardHeader className="text-navy-blue flex justify-between">
             <div className="flex flex-row items-center gap-2">
               <FileText className="size-4" />{" "}
               <div className="bg-secondary rounded-md px-2">
@@ -326,38 +332,40 @@ const ReceiptsGrid = ({ receipts }: { receipts: ReceiptWithProducts[] }) => {
               MDL {receipt.total}
             </div>
           </CardHeader>
-          <CardContent className="my-0 flex flex-1 flex-col py-0">
+          <CardContent className="text-navy-blue my-0 flex flex-1 flex-col py-0">
             <div className="mb-2 flex flex-row items-center text-xs">
               <MapPinIcon className="mr-2 size-4" />{" "}
-              <div className="text-muted-foreground"> {receipt.location} </div>
+              <div className="text-navy-blue"> {receipt.location} </div>
             </div>
             <div className="mb-2 flex flex-row items-center text-xs">
               <Calendar className="mr-2 size-4" />{" "}
-              <div className="text-muted-foreground">
+              <div className="text-navy-blue">
                 <TimeAgo date={receipt.dateTime} /> (
                 {receipt.dateTime.toLocaleDateString()})
               </div>
             </div>
             <Separator orientation="horizontal" className="my-1" />
-            <div className="text-muted-foreground text-sm">
+            <div className="text-navy-blue text-sm font-medium">
               PRODUCTS ({receipt.products.length})
             </div>
-            <div className="my-3">
+            <div className="text-navy-blue my-3">
               {receipt.products.slice(0, 3).map((product) => (
                 <div key={product.id} className="text-sm">
                   <div className="flex items-center justify-between">
-                    {product.name}
-                    <span className="text-muted-foreground text-xs">
+                    <span className="font-medium truncate max-w-[70%]">{product.name}</span>
+                    <span className="text-navy-blue text-xs whitespace-nowrap">
                       {product.quantity} x {product.unitPrice}{" "}
                     </span>
                   </div>
-                  <div className="text-right">MDL {product.totalPrice}</div>
+                  <div className="text-right font-medium">
+                    MDL {product.totalPrice}
+                  </div>
                 </div>
               ))}
             </div>
             <div className="mt-auto">
               <Separator orientation="horizontal" className="my-1" />
-              <div className="text-muted-foreground my-0 py-0 text-right text-xs">
+              <div className="text-navy-blue my-0 py-0 text-right text-xs">
                 Reg. no: {receipt.registrationNumber}
               </div>
             </div>
