@@ -19,6 +19,18 @@ const Header = () => {
   // -------- when user clicks outside of the mobile menu, it automatically closes ----------
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      const isClerkElement =
+        target.closest("[data-clerk-element]") ??
+        target.closest(".cl-userButtonPopover") ??
+        target.closest(".cl-userButtonTrigger") ??
+        target.closest(".cl-internal-") ??
+        target.closest('[class*="cl-"]');
+      // if user clicks outside but it's on the Clerk popover,
+      // perform the Clerk action instead of closing the header menu
+      if (isClerkElement) {
+        return;
+      }
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
