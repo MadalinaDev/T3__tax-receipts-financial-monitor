@@ -26,7 +26,7 @@ const Upload = () => {
   };
 
   return (
-    <div className="mx-auto my-2 md:my-12 md:min-w-2xl">
+    <div className="mx-auto my-2 max-w-sm md:my-12 md:min-w-xl">
       <div className="my-10 text-center">
         <p className="text-lg font-semibold">Upload your receipt</p>
         <p className="text-md">
@@ -124,7 +124,7 @@ const Upload = () => {
         </TabsContent>
       </Tabs>
 
-      <Alert className="mt-6">
+      <Alert className="my-6">
         <AiOutlineQuestionCircle className="text-navy-blue" />
         <AlertTitle className="text-navy-blue">
           Don&lsquo;t have any receipts to upload yet?
@@ -133,7 +133,7 @@ const Upload = () => {
           <span>
             Test the platform functionality with these sample options:
           </span>
-          <div className="text-navy-blue flex w-full items-center justify-center gap-x-4">
+          <div className="text-navy-blue flex w-full flex-col items-center justify-center gap-4 md:flex-row">
             <Button
               variant="outline"
               onClick={() => setLink(testURLS[0] ?? "")}

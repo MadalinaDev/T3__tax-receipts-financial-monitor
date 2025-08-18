@@ -40,7 +40,7 @@ const Footer = () => {
       <Separator className="mx-auto mb-4 bg-white/10 px-8 md:px-36" />
       <div className="text-center">
         <h3 className="text-md font-semibold">Built by Madalina Chirpicinic</h3>
-        <h5 className="my-2 text-sm/4 text-white/80">
+        <h5 className="my-2 text-sm/4 text-white/80 px-2">
           Passionate full-stack developer creating innovative solutions <br /> across
           diverse technologies and industries.
         </h5>
