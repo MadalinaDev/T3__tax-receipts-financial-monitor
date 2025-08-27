@@ -7,6 +7,7 @@ import {
   HardDriveUpload,
   PartyPopper,
   MoveRight,
+  RefreshCw,
 } from "lucide-react";
 import Receipt from "./receiptSkeleton";
 import { Button } from "../ui/button";
@@ -27,31 +28,32 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   }>();
   const { isLoaded, isSignedIn, user } = useUser();
 
-  useEffect(() => {
+  const fetchScrape = async () => {
     setLoading(true);
-    const scrapeByLink = async () => {
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-        const response = await fetch(
-          `${baseUrl}api/scrape?link=${scrapeLink}&ultra_premium=true`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        const result = (await response.json()) as ReceiptType;
-        if (response.status === 200) setReceiptData(result);
-        return;
-      } catch (e) {
-        console.error("Client-side error during web scrapping: ", e);
-        return;
-      } finally {
-        setLoading(false);
-      }
-    };
-    void scrapeByLink();
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+      const response = await fetch(
+        `${baseUrl}api/scrape?link=${scrapeLink}&ultra_premium=true`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+
+      if (!response.ok)
+        throw new Error(`Server responded with ${response.status}`);
+
+      const result = (await response.json()) as ReceiptType;
+      setReceiptData(result);
+    } catch (e) {
+      console.error("Web scraping error:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchScrape();
   }, [scrapeLink]);
 
   if (!isLoaded) return null;
@@ -161,7 +163,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
           <Receipt receiptData={receiptData} />
           <Button
             variant="outline"
-            className="mx-auto my-6 md:mb-12 block"
+            className="mx-auto my-6 block md:mb-12"
             onClick={handleSaveReceiptData}
           >
             <div className="flex flex-row gap-2 px-6">
@@ -170,13 +172,18 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
           </Button>
         </div>
       ) : (
-        <div className="mx-auto my-[15%] flex flex-row items-center justify-center gap-8">
-          <Ban className="size-8 md:size-6" />
-          <div>
-            {" "}
-            An unexpected error occured while webscrapping the data. For more
-            information please check the console.
+        <div className="text-navy-blue mx-auto my-[35%] text-center">
+          <Ban className="mx-auto mb-4 size-8 md:size-6" />
+          <div className="mb-6">
+            Oops! We couldn not scrape the data. Please try again later.
           </div>
+          <Button
+            variant="outline"
+            onClick={fetchScrape}
+            className="mx-auto flex items-center gap-2"
+          >
+            Retry <RefreshCw className="size-6" />
+          </Button>
         </div>
       )}
     </div>
