@@ -1,15 +1,24 @@
-"use server"; 
+"use server";
 
-import UploadWebScrapper from "~/components/client/uploadWebScrapper";
-import Upload from "~/components/client/upload";
+import { Suspense } from "react";
+import UploadPageContent from "~/components/client/uploadPage/uploadPageContent";
 
-export default async function UploadPage({
-  searchParams,
-}: {
+interface UploadPageProps {
   searchParams: Promise<{ scrapeLink: string }>;
-}) {
+}
+
+export default async function UploadPage({ searchParams }: UploadPageProps) {
   const { scrapeLink } = await searchParams;
 
-  if (scrapeLink) return <UploadWebScrapper scrapeLink={scrapeLink} />;
-  return <Upload />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[40vh] w-full items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
+        </div>
+      }
+    >
+      <UploadPageContent scrapeLink={scrapeLink} />
+    </Suspense>
+  );
 }
