@@ -4,19 +4,16 @@ import {
   Loader2,
   Check,
   Ban,
-  HardDriveUpload,
   PartyPopper,
   MoveRight,
-  RefreshCw,
 } from "lucide-react";
 import Receipt from "./receiptSkeleton";
 import { Button } from "../ui/button";
 import type { ReceiptType } from "~/types/receipt";
-import { api } from "~/trpc/react";
-import { type ProductsInsert } from "~/types/receipt";
 import Link from "next/link";
-import { useUser } from "@clerk/clerk-react";
 import Upload from "./upload";
+import SaveReceiptButton from "./uploadPage/saveReceiptButton";
+import RetryScrapeButton from "./uploadPage/retryScrapeButton";
 
 const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   const [loading, setLoading] = useState<boolean | null>(null);
@@ -26,7 +23,6 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
     success: boolean;
     message: string;
   }>();
-  const { isLoaded, isSignedIn, user } = useUser();
 
   const fetchScrape = async () => {
     setLoading(true);
@@ -55,71 +51,6 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
   useEffect(() => {
     void fetchScrape();
   }, [scrapeLink]);
-
-  if (!isLoaded) return null;
-  if (!isSignedIn) return null;
-
-  const saveReceiptData = api.receipts.create.useMutation({
-    onSuccess: () => {
-      setConfirmationMessage({
-        success: true,
-        message: "Your receipt was successfully uploaded into the system!",
-      });
-    },
-    onError: (e) => {
-      setConfirmationMessage({
-        success: false,
-        message:
-          "An unexpected error occured while uploading your receipt. Please try again later.",
-      });
-      console.error("Error: ", e);
-    },
-    onSettled: () => {
-      setLoading(false);
-    },
-  });
-
-  const handleSaveReceiptData = () => {
-    setLoading(true);
-    setStartedConfirm(true);
-    if (!receiptData) {
-      console.error(
-        "Client-side error: there is no valid data to be uploaded.",
-      );
-      return;
-    }
-    if (!user) {
-      console.error("Client-side error: no user signed in.");
-      return;
-    }
-
-    const formattedReceipt = {
-      userId: user.id,
-      url: scrapeLink,
-      dateTime: new Date(receiptData.dateTime),
-      location: receiptData.company.address,
-      total: String(receiptData.totalAmount),
-      receiptNumber: receiptData.receiptNumber,
-      registrationNumber: receiptData.company.registrationNumber,
-      companyName: receiptData.company.name,
-      companyFiscalCode: receiptData.company.fiscalCode,
-    };
-
-    const formattedProducts: ProductsInsert[] = [];
-    receiptData.products.forEach((item) => {
-      formattedProducts.push({
-        name: item.name,
-        quantity: String(item.quantity),
-        unitPrice: String(item.price),
-        totalPrice: String(item.totalPrice),
-      });
-    });
-
-    saveReceiptData.mutate({
-      receipt: formattedReceipt,
-      products: formattedProducts,
-    });
-  };
 
   if (!scrapeLink) return <Upload />;
 
@@ -161,15 +92,13 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
             </div>
           </div>
           <Receipt receiptData={receiptData} />
-          <Button
-            variant="outline"
-            className="mx-auto my-6 block md:mb-12"
-            onClick={handleSaveReceiptData}
-          >
-            <div className="flex flex-row gap-2 px-6">
-              Upload this receipt to my database <HardDriveUpload />
-            </div>{" "}
-          </Button>
+          <SaveReceiptButton
+            receiptData={receiptData}
+            setLoading={setLoading}
+            setStartedConfirm={setStartedConfirm}
+            setConfirmationMessage={setConfirmationMessage}
+            scrapeLink={scrapeLink}
+          />
         </div>
       ) : (
         <div className="text-navy-blue mx-auto my-[35%] text-center">
@@ -177,13 +106,7 @@ const UploadWebScrapper = ({ scrapeLink }: { scrapeLink: string }) => {
           <div className="mb-6">
             Oops! We couldn not scrape the data. Please try again later.
           </div>
-          <Button
-            variant="outline"
-            onClick={fetchScrape}
-            className="mx-auto flex items-center gap-2"
-          >
-            Retry <RefreshCw className="size-6" />
-          </Button>
+          <RetryScrapeButton fetchScrape={fetchScrape}/>
         </div>
       )}
     </div>

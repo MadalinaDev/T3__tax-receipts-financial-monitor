@@ -1,4 +1,5 @@
-// import Upload from "~/components/client/upload";
+"use server"; 
+
 import UploadWebScrapper from "~/components/client/uploadWebScrapper";
 import Upload from "~/components/client/upload";
 
