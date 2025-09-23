@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Loader2, Check, Ban, PartyPopper, MoveRight } from "lucide-react";
-import Receipt from "../receiptSkeleton";
+import Receipt from "./receiptSkeleton";
 import { Button } from "~/components/ui/button";
 import type { ReceiptType } from "~/types/receipt";
 import Link from "next/link";

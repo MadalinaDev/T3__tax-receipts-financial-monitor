@@ -1,4 +1,4 @@
-import ReceiptsTable from "~/components/client/receiptsTable";
+import ReceiptsTable from "~/components/client/receiptsPage/receiptsTable";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 

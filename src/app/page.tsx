@@ -1,5 +1,5 @@
 import { HydrateClient } from "~/trpc/server";
-import Home from "~/components/client/home";
+import Home from "~/components/client/homePage/home";
 
 export default async function Homepage() {
 

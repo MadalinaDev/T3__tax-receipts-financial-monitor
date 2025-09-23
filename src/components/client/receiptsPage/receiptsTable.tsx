@@ -1,9 +1,9 @@
 "use client";
 import { useEffect } from "react";
-import { Card, CardHeader, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Separator } from "../ui/separator";
+import { Card, CardHeader, CardContent } from "~/components/ui/card";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Separator } from "~/components/ui/separator";
 import {
   FileText,
   Search,
@@ -16,21 +16,21 @@ import {
   X,
 } from "lucide-react";
 import TimeAgo from "react-timeago";
-import { DatePicker } from "../ui/date-picker";
+import { DatePicker } from "~/components/ui/date-picker";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "../ui/select";
-import { Slider } from "../ui/slider";
+} from "~/components/ui/select";
+import { Slider } from "~/components/ui/slider";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationEllipsis,
-} from "../ui/pagination";
+} from "~/components/ui/pagination";
 import { api } from "~/trpc/react";
 import type { ReceiptWithProducts } from "~/types/receipt";
 import { parseAsInteger, useQueryState } from "nuqs";

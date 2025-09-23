@@ -1,9 +1,9 @@
 "use client";
 import { ChevronRight } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "~/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Badge } from "../ui/badge";
-import { Card, CardContent } from "../ui/card";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent } from "~/components/ui/card";
 import {
   Upload,
   Brain,

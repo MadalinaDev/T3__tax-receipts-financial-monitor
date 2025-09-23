@@ -1,5 +1,5 @@
-import { Card, CardHeader, CardContent } from "../ui/card";
-import { Separator } from "../ui/separator";
+import { Card, CardHeader, CardContent } from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
 import type { ReceiptType } from "~/types/receipt";
 
 const Receipt = ({ receiptData } : {receiptData: ReceiptType}) => {
