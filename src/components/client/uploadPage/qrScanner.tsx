@@ -31,7 +31,7 @@ export default function QrScanner({
 
     return () => {
       if (scannerRef.current?.clear) {
-        scannerRef.current.clear().catch(() => {});
+        scannerRef.current.clear().catch((error) => {console.log(error)});
       }
     };
   }, [onScan]);

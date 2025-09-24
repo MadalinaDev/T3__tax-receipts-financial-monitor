@@ -61,7 +61,12 @@ export default function UploadForm({
         </TabsContent>
 
         <TabsContent value="qr">
-          <QrScannerForm />
+          <QrScannerForm
+            link={link}
+            setLink={setLink}
+            processScrapeByLink={processScrapeByLink}
+            testURLS={testURLS}
+          />
         </TabsContent>
 
         <TabsContent value="manual">
@@ -114,7 +119,10 @@ function ManualForm() {
           <Input id="issue-date" type="date" />
         </div>
       </div>
-      <Button className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full" disabled>
+      <Button
+        className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
+        disabled
+      >
         Process
       </Button>
     </>
@@ -148,12 +156,14 @@ function TestReceiptsAlert({
   );
 }
 
-const QrScannerForm = () => {
-  const [scannedLink, setScannedLink] = useState<string>("");
+const QrScannerForm = ({
+  link,
+  setLink,
+  processScrapeByLink,
+}: UploadFormProps) => {
 
   const handleScannedLink = (link: string) => {
-    setScannedLink(link);
-    console.log(link);
+    setLink(link);
   };
 
   return (
@@ -161,11 +171,12 @@ const QrScannerForm = () => {
       <CardContent className="flex flex-col items-center justify-center py-4">
         <QrScanner onScan={handleScannedLink} />
 
-        {scannedLink && (
-          <div>
-            <div>Your scanned link is: {scannedLink}</div>
+        {link && (
+          <div className="w-full">
+            <div className="mt-6">Your scanned link is: {link}</div>
             <Button
-              variant="default"
+              onClick={processScrapeByLink}
+              disabled={!link}
               className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
             >
               Process
