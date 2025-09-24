@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "~/components/ui/tabs";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -7,7 +8,8 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { FileQuestionIcon as AiOutlineQuestionCircle } from "lucide-react";
-import { Scan } from "lucide-react";
+import QrScanner from "./qrScanner";
+
 interface UploadFormProps {
   link: string;
   setLink: (link: string) => void;
@@ -55,31 +57,22 @@ export default function UploadForm({
           >
             Process
           </Button>
+          <TestReceiptsAlert testURLS={testURLS} setLink={setLink} />
         </TabsContent>
 
         <TabsContent value="qr">
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-4">
-              <Scan className="text-muted-foreground m-3 size-8 md:size-12" />
-              <div className="text-muted-foreground">
-                Upload a photo with your QR
-              </div>
-            </CardContent>
-          </Card>
-          <Button
-            variant="default"
-            className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
-          >
-            Process
-          </Button>
+          <QrScannerForm
+            link={link}
+            setLink={setLink}
+            processScrapeByLink={processScrapeByLink}
+            testURLS={testURLS}
+          />
         </TabsContent>
 
         <TabsContent value="manual">
           <ManualForm />
         </TabsContent>
       </Tabs>
-
-      <TestReceiptsAlert testURLS={testURLS} setLink={setLink} />
     </div>
   );
 }
@@ -126,7 +119,10 @@ function ManualForm() {
           <Input id="issue-date" type="date" />
         </div>
       </div>
-      <Button className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full">
+      <Button
+        className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
+        disabled
+      >
         Process
       </Button>
     </>
@@ -159,3 +155,35 @@ function TestReceiptsAlert({
     </Alert>
   );
 }
+
+const QrScannerForm = ({
+  link,
+  setLink,
+  processScrapeByLink,
+}: UploadFormProps) => {
+
+  const handleScannedLink = (link: string) => {
+    setLink(link);
+  };
+
+  return (
+    <Card>
+      <CardContent className="flex flex-col items-center justify-center py-4">
+        <QrScanner onScan={handleScannedLink} />
+
+        {link && (
+          <div className="w-full">
+            <div className="mt-6">Your scanned link is: {link}</div>
+            <Button
+              onClick={processScrapeByLink}
+              disabled={!link}
+              className="bg-navy-blue/80 hover:bg-navy-blue/60 my-2 w-full"
+            >
+              Process
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
