@@ -1,7 +1,8 @@
-import UnderConstruction from "~/components/layout/underConstruction";
+"use server";
+import StatisticsContentPage from "~/components/client/statisticsPage/statisticsContentPage";
 
 const StatisticsPage = () => {
-  return <UnderConstruction />;
+  return <StatisticsContentPage />;
 };
 
 export default StatisticsPage;
