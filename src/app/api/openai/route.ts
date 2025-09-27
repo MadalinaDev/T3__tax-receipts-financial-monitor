@@ -1,8 +1,13 @@
 import OpenAI from "openai";
 import { NextResponse, type NextRequest } from "next/server";
+import type { ReceiptWithProducts } from "~/types/receipt";
+
+type PostRequestType = {
+  receipts: ReceiptWithProducts;
+}
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const body = (await request.json()) as PostRequestType;
   const { receipts } = body;
 
   const openai = new OpenAI({
