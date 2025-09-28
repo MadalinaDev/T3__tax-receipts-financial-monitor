@@ -6,6 +6,7 @@ export interface ProductType {
   quantity: number;
   price: number;
   totalPrice: number;
+  category?: string;
 }
 export interface ReceiptCompanyType {
   name: string;

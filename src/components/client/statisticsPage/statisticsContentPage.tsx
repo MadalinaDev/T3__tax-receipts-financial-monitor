@@ -4,24 +4,10 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 import { Loader2 } from "lucide-react";
-
-// partial type definition for the object returned from the API
-type OpenAIResponseType = {
-  choices: {
-    index: number;
-    message: {
-      role: string;
-      content: string;
-    };
-  }[];
-  usage: {
-    total_tokens: number;
-  };
-};
+import { type ApiResponse } from "~/app/api/openai/route";
 
 const StatisticsContentPage = () => {
-  const [answer, setAnswer] = useState<string>("...");
-  const [tokens, setTokens] = useState<number>(0);
+  const [responseData, setResponseData] = useState<ApiResponse>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { data: receipts } = api.receipts.get.useQuery({
@@ -43,28 +29,43 @@ const StatisticsContentPage = () => {
         receipts: receipts?.items ?? [],
       }),
     });
-    const data = (await result.json()) as OpenAIResponseType;
-    console.log(data);
+    const data = (await result.json()) as ApiResponse;
+    setResponseData(data);
     setIsLoading(false);
-    const fallbackResponse =
-      "No answer from OpenAI. Check console for more details.";
-    console.log(data.choices[0]?.message.content ?? fallbackResponse);
-    setAnswer(data.choices[0]?.message.content ?? fallbackResponse);
-    setTokens(data.usage.total_tokens);
   };
 
   return (
     <>
       <div className="my-12 flex w-140 flex-col">
         <Button onClick={handleRenderStatistics} className="bg-navy-blue my-4">
-          Process your receipts with OpenAI!
+          Organize Products with AI
         </Button>
         {isLoading ? (
-          <Loader2 className="mx-auto animate-spin my-4" />
+          <Loader2 className="mx-auto my-4 animate-spin" />
         ) : (
           <div>
-            <div>Response: {answer}</div>
-            <div>Tokens used: {tokens}</div>{" "}
+            <div>Tokens used: {responseData?.tokens ?? 0}</div>{" "}
+            {!responseData?.success ? (
+              <div>{responseData?.message}</div>
+            ) : (
+              <div>
+                <div>{responseData?.message}</div>
+                <div>
+                  {responseData?.data?.map((a) => (
+                    <div key={a.id}>
+                      <div className="flex flex-row">
+                        {" "}
+                        <div className="font-semibold">Name:</div> {a.name}
+                      </div>
+                      <div className="flex flex-row">
+                        {" "}
+                        <div className="font-semibold">Category:</div> {a.category}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

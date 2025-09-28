@@ -1,1 +1,0 @@
-ALTER TABLE "products" ALTER COLUMN "receipt_id" SET DATA TYPE uuid USING receipt_id::uuid;
