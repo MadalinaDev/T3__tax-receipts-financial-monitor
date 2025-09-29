@@ -10,13 +10,7 @@ const StatisticsContentPage = () => {
   const [responseData, setResponseData] = useState<ApiResponse>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { data: receipts } = api.receipts.get.useQuery({
-    page: 1,
-    totalItems: 100,
-    filters: null,
-    sortBy: null,
-    search: null,
-  });
+  const { data: receipts } = api.receipts.getAll.useQuery();
 
   const handleRenderStatistics = async () => {
     setIsLoading(true);
@@ -26,7 +20,7 @@ const StatisticsContentPage = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        receipts: receipts?.items ?? [],
+        receipts: receipts ?? [],
       }),
     });
     const data = (await result.json()) as ApiResponse;
@@ -36,7 +30,7 @@ const StatisticsContentPage = () => {
 
   return (
     <>
-      <div className="my-12 flex w-140 flex-col">
+      <div className="my-12 flex w-140 flex-col justify-center items-center mx-auto">
         <Button onClick={handleRenderStatistics} className="bg-navy-blue my-4">
           Organize Products with AI
         </Button>
