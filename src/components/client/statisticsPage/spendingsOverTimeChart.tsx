@@ -5,9 +5,9 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   Line,
   CartesianGrid,
+  ResponsiveContainer,
 } from "recharts";
 import { type ChartTypeSpendingsOverTime } from "~/types/statisticsCharts";
 
@@ -18,19 +18,21 @@ const SpendingsOverTimeChart = ({
 }) => {
   return (
     <>
-      <LineChart
-        width={730}
-        height={250}
-        data={data}
-        margin={{ top: 15, right: 30, left: 20, bottom: 35 }}
-      >
-        <CartesianGrid strokeDasharray="1 1" />
-        <XAxis dataKey="name" />
-        <YAxis dataKey="dy" />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="dy" stroke="#8884d8" />
-      </LineChart>
+      <div className="text-center text-md font-semibold my-2">Expense Timeline (MDL)</div>
+      <div className="mb-4 h-80 w-full lg:mx-12 lg:mb-10">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={data}
+            margin={{ top: 15, right: 5, left: 5, bottom: 35 }}
+          >
+            <CartesianGrid strokeDasharray="1 1" />
+            <XAxis dataKey="name" />
+            <YAxis dataKey="dy" />
+            <Tooltip />
+            <Line type="monotone" dataKey="dy" stroke="#2a2d70" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </>
   );
 };

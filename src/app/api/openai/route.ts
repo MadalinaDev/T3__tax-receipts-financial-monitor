@@ -23,14 +23,16 @@ const preprocessReceipts = (receipts: ReceiptWithProducts[]) => {
   if (!receipts || !Array.isArray(receipts)) return [];
   const products: { id: string; name: string }[] = [];
   receipts.forEach((r) => {
-    r.products
-      .filter((p) => p.category === null)
-      .forEach((p) => {
-        products.push({
-          id: p.id,
-          name: p.name,
+    if (r.products) {
+      r.products
+        .filter((p) => p.category === null)
+        .forEach((p) => {
+          products.push({
+            id: p.id,
+            name: p.name,
+          });
         });
-      });
+    }
   });
   return products;
 };
@@ -116,7 +118,8 @@ Categorize products into categories. Return pure JSON only in the format: {[cate
       return NextResponse.json(errorParseApiResponse);
     }
 
-    const productsCategorized: (ProductsTableType | undefined)[] = await postprocessReceipts(parsedData);
+    const productsCategorized: (ProductsTableType | undefined)[] =
+      await postprocessReceipts(parsedData);
     const filteredProducts = productsCategorized.filter(
       (product): product is ProductsTableType => product !== undefined,
     );
@@ -133,7 +136,7 @@ Categorize products into categories. Return pure JSON only in the format: {[cate
     const errorApiRoute: ApiResponse = {
       success: false,
       message: "API route error",
-    }
+    };
     return NextResponse.json(errorApiRoute);
   }
 }

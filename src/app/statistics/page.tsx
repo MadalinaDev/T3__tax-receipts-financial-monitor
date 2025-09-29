@@ -1,12 +1,17 @@
 "use server";
-import StatisticsContentPage from "~/components/client/statisticsPage/statisticsContentPage";
+
+import ProductsCategorizationButton from "~/components/client/statisticsPage/productsCategorizationButton";
 import SpendingsOverTimeChart from "~/components/client/statisticsPage/spendingsOverTimeChart";
+import ProductsByCategoryChart from "~/components/client/statisticsPage/productsByCategoryChart";
 import { api } from "~/trpc/server";
 import { type ReceiptsTableType } from "~/server/db/schema/receipts";
+import { type ProductsTableType } from "~/server/db/schema/products";
 import { type ChartTypeSpendingsOverTime } from "~/types/statisticsCharts";
+import { CATEGORIES } from "~/lib/constants";
 
-
-const generateSpendingsOverTime = (receipts: ReceiptsTableType[]): ChartTypeSpendingsOverTime => {
+const generateSpendingsOverTime = (
+  receipts: ReceiptsTableType[],
+): ChartTypeSpendingsOverTime => {
   return receipts.map((r) => ({
     id: r.id,
     name: r.dateTime.toLocaleDateString("en-GB"),
@@ -15,16 +20,45 @@ const generateSpendingsOverTime = (receipts: ReceiptsTableType[]): ChartTypeSpen
   }));
 };
 
+const generateProductsByCategory = (products: ProductsTableType[]) => {
+  // process products statistics (make necessary aggregations)
+  const categoriesMap: Record<string, number> = Object.fromEntries(
+    CATEGORIES.map((c) => [c.key, 0]),
+  );
+  const shortenedCategories = CATEGORIES.map((c) => c.key);
+  type CategoriesType = (typeof shortenedCategories)[number];
+  products.filter(Boolean).forEach((p: ProductsTableType) => {
+    const category = p.category;
+    if (category && categoriesMap[category] !== undefined) {
+      categoriesMap[category] += Number(p.quantity);
+    }
+  });
+  // return the array in chart data format
+  const data: { id: string; name: CategoriesType; dy: number }[] = [];
+  for (const [key, value] of Object.entries(categoriesMap)) {
+    if (value > 0) {
+      data.push({
+        id: key,
+        name: key,
+        dy: Math.round(value),
+      });
+    }
+  }
+  return data;
+};
 
 const StatisticsPage = async () => {
   const receipts = await api.receipts.getAll();
   const chartDataSpendingsOverTime = generateSpendingsOverTime(receipts);
+  const products = await api.products.getAll();
+  const chartDataProductsByCategory = generateProductsByCategory(products);
 
   return (
-    <>
-      <StatisticsContentPage />
+    <div>
+      <ProductsCategorizationButton />
       <SpendingsOverTimeChart data={chartDataSpendingsOverTime} />
-    </>
+      <ProductsByCategoryChart data={chartDataProductsByCategory} />
+    </div>
   );
 };
 
