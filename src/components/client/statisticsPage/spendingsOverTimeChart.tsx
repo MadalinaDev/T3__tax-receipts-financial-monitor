@@ -18,8 +18,11 @@ const SpendingsOverTimeChart = ({
 }) => {
   return (
     <>
-      <div className="text-center text-md font-semibold my-2">Expense Timeline (MDL)</div>
-      <div className="mb-4 h-80 w-full lg:mx-12 lg:mb-10">
+      <div className="flex flex-col gap-0">
+        <p className="text-lg font-semibold">Spending Over Time</p>
+        <p className="text-md">By receipt spending trends (MDL)</p>
+      </div>
+      <div className="my-4 h-80 w-full lg:mx-12 lg:mb-10">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}

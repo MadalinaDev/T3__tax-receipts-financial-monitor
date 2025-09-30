@@ -20,10 +20,11 @@ const ProductsByCategoryChart = ({
   console.log(data);
   return (
     <>
-      <div className="text-md text-center font-semibold my-2">
-        Top Spending Categories
+      <div className="flex flex-col gap-0">
+        <p className="text-lg font-semibold">Product Categories</p>
+        <p className="text-md">Quantities purchased by category</p>
       </div>
-      <div className="mb-4 h-120 w-full lg:mx-12 lg:mb-10">
+      <div className="my-4 h-120 w-full lg:mx-12 lg:mb-10">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
@@ -38,7 +39,7 @@ const ProductsByCategoryChart = ({
             <XAxis
               dataKey="name"
               interval={0}
-              angle={-90}
+              angle={-50}
               textAnchor="end"
               height={80}
             />

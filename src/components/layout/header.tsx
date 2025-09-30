@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -83,7 +84,9 @@ const Header = () => {
   );
 };
 
-const NavLinks = ({ closeMenu }: {closeMenu?: () => void}) => {
+const NavLinks = ({ closeMenu }: { closeMenu?: () => void }) => {
+  const pathname = usePathname();
+
   const headerButtons = [
     {
       id: "upload",
@@ -104,16 +107,23 @@ const NavLinks = ({ closeMenu }: {closeMenu?: () => void}) => {
 
   return (
     <>
-      {headerButtons.map((item) => (
-        <Link key={item.id} href={item.path} prefetch={false}>
-          <div className="group relative px-2" onClick={closeMenu}>
-            <span className="group-hover:text-yellow duration-200 group-hover:duration-300">
-              {item.title}
-            </span>
-            <span className="bg-yellow absolute right-0 -bottom-1 left-0 mx-auto h-[1px] w-0 duration-200 group-hover:w-[85%] group-hover:duration-300" />
-          </div>
-        </Link>
-      ))}
+      {headerButtons.map((item) => {
+        const isActive = pathname === item.path;
+        return (
+          <Link key={item.id} href={item.path} prefetch={false}>
+            <div className="group relative px-2" onClick={closeMenu}>
+              <span
+                className={`group-hover:text-yellow duration-200 group-hover:duration-300 ${isActive ? "text-yellow duration-300" : ""} `}
+              >
+                {item.title}
+              </span>
+              <span
+                className={`bg-yellow absolute right-0 -bottom-1 left-0 mx-auto h-[1px] w-0 duration-200 group-hover:w-[85%] group-hover:duration-300 ${isActive ? "w-[85%] duration-300" : ""} `}
+              />
+            </div>
+          </Link>
+        );
+      })}
     </>
   );
 };
