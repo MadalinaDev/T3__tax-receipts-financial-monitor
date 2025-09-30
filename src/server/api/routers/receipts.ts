@@ -40,6 +40,16 @@ export const receiptsRouter = createTRPCRouter({
       return;
     }),
 
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    const receiptsResult = await ctx.db
+      .select()
+      .from(receipts)
+      .where(eq(receipts.userId, ctx.session.user.id))
+      .orderBy(sql`${receipts.dateTime} ASC`);
+
+    return receiptsResult;
+  }),
+
   get: protectedProcedure
     .input(
       z.object({
@@ -54,7 +64,9 @@ export const receiptsRouter = createTRPCRouter({
             amountEnd: z.number().nullable(),
           })
           .nullable(),
-        sortBy: z.enum(["date-desc", "date-asc", "amount-asc", "amount-desc"]).nullable(),
+        sortBy: z
+          .enum(["date-desc", "date-asc", "amount-asc", "amount-desc"])
+          .nullable(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -83,11 +95,15 @@ export const receiptsRouter = createTRPCRouter({
         : undefined;
 
       const amountClause = input.filters
-      ? and(
-        input.filters.amountStart
-        ? sql`${receipts.total} >= ${input.filters.amountStart}` :undefined,
-        input.filters.amountEnd ? sql`${receipts.total} <= ${input.filters.amountEnd}` : undefined
-      ) : undefined;
+        ? and(
+            input.filters.amountStart
+              ? sql`${receipts.total} >= ${input.filters.amountStart}`
+              : undefined,
+            input.filters.amountEnd
+              ? sql`${receipts.total} <= ${input.filters.amountEnd}`
+              : undefined,
+          )
+        : undefined;
 
       let orderByClause;
       switch (input.sortBy) {
@@ -111,7 +127,7 @@ export const receiptsRouter = createTRPCRouter({
         eq(receipts.userId, ctx.session.user.id),
         searchClause,
         dateClause,
-        amountClause
+        amountClause,
       );
 
       const receiptsData = await ctx.db

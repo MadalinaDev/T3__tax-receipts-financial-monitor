@@ -34,7 +34,7 @@ export default function RootLayout({
               <HydrateClient>
                 <div className="flex min-h-screen flex-col">
                   <Header />
-                  <div className="mx-auto max-w-[1580px] flex-1 px-8 md:px-36">
+                  <div className="mx-auto w-full max-w-[1580px] flex-1 px-8 md:px-36">
                     {children}
                   </div>
                   <Footer />

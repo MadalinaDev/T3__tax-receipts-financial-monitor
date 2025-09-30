@@ -19,6 +19,7 @@ export const products = pgTable("products", {
   receiptId: uuid("receipt_id")
     .references(() => receipts.id, { onDelete: "cascade" })
     .notNull(),
+  category: text("category"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),

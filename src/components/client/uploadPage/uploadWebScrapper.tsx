@@ -35,9 +35,8 @@ export default function UploadWebScrapper({
     setReceiptData(null);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
       const response = await fetch(
-        `${baseUrl}api/scrape?link=${encodeURIComponent(scrapeLink)}&ultra_premium=true`,
+        `/api/scrape?link=${encodeURIComponent(scrapeLink)}&ultra_premium=true`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },
