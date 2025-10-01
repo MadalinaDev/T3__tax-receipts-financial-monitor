@@ -50,6 +50,32 @@ export const receiptsRouter = createTRPCRouter({
     return receiptsResult;
   }),
 
+  getOne: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const receiptResult = await ctx.db
+        .select()
+        .from(receipts)
+        .where(eq(receipts.id, input.id));
+
+      const receipt = receiptResult[0];
+      if (!receipt) {
+          throw new Error(
+            "Server-side error: No receipt was found.",
+          );
+      }
+
+      const productsData = await ctx.db
+        .select()
+        .from(products)
+        .where(eq(products.receiptId, receipt.id));
+
+      return {
+        ...receipt,
+        products: productsData,
+      };
+    }),
+
   get: protectedProcedure
     .input(
       z.object({
