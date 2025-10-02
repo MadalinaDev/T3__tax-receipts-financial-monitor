@@ -3,7 +3,7 @@
 import { FaRegBuilding } from "react-icons/fa";
 import { type ReceiptWithProducts } from "~/types/receipt";
 import { Separator } from "~/components/ui/separator";
-import { Calendar, FileText, MapPin, Box } from "lucide-react";
+import { Calendar, FileText, MapPin, Box, Map } from "lucide-react";
 import { format } from "date-fns";
 import {
   Table,
@@ -14,9 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { CATEGORIES } from "~/lib/constants";
+import StoreMap from "./storeMap";
 
 const ReceiptDetails = ({ receipt }: { receipt?: ReceiptWithProducts }) => {
-
+  
   if (!receipt)
     return (
       <div className="text-md text-muted-foreground flex h-full w-full items-center justify-center">
@@ -81,7 +83,7 @@ const ReceiptDetails = ({ receipt }: { receipt?: ReceiptWithProducts }) => {
 
       <Separator />
 
-      <div className="my-4 flex flex-row items-baseline justify-between">
+      <div className="mt-4 -mb-2 flex flex-row items-baseline justify-between">
         <div className="flex items-center gap-4 font-medium">
           <div className="flex h-10 w-10 items-center justify-center rounded-md">
             <Box className="text-muted-navy-blue size-6" />
@@ -95,12 +97,15 @@ const ReceiptDetails = ({ receipt }: { receipt?: ReceiptWithProducts }) => {
 
       <Table className="text-muted-navy-blue">
         <TableHeader>
-          <TableRow>
+          <TableRow className="bg-[#f9f9f9]">
             {/* to do: reduce header names for mobile, add ellipsis for long product names */}
-            <TableHead className="text-navy-blue text-sm w-180">PRODUCT</TableHead>
+            <TableHead className="text-navy-blue w-140 text-sm">
+              PRODUCT
+            </TableHead>
+            <TableHead className="text-navy-blue text-sm">CATEGORY</TableHead>
             <TableHead className="text-navy-blue text-sm">QUANTITY</TableHead>
             <TableHead className="text-navy-blue text-sm">UNIT PRICE</TableHead>
-            <TableHead className="text-navy-blue text-right text-sm w-20">
+            <TableHead className="text-navy-blue w-20 text-right text-sm">
               TOTAL
             </TableHead>
           </TableRow>
@@ -109,6 +114,10 @@ const ReceiptDetails = ({ receipt }: { receipt?: ReceiptWithProducts }) => {
           {receipt.products.map((p) => (
             <TableRow key={p.id}>
               <TableCell className="font-medium">{p.name}</TableCell>
+              <TableCell>
+                {CATEGORIES.find((c) => c.key === p.category)?.name ??
+                  "Unknown"}
+              </TableCell>
               <TableCell>{p.quantity}</TableCell>
               <TableCell>MDL {p.unitPrice}</TableCell>
               <TableCell className="text-right">MDL {p.totalPrice}</TableCell>
@@ -117,11 +126,20 @@ const ReceiptDetails = ({ receipt }: { receipt?: ReceiptWithProducts }) => {
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
+            <TableCell colSpan={4}>TOTAL</TableCell>
             <TableCell className="text-right">MDL {receipt.total}</TableCell>
           </TableRow>
         </TableFooter>
       </Table>
+
+      <div className="mt-4 flex items-center gap-4 font-medium">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md">
+          <Map className="text-muted-navy-blue size-6" />
+        </div>
+        <div className="">Store location</div>
+      </div>
+
+      <StoreMap address={receipt.location}/>
     </div>
   );
 };
