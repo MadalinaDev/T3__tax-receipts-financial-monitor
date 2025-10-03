@@ -34,6 +34,7 @@ import {
 import { api } from "~/trpc/react";
 import type { ReceiptWithProducts } from "~/types/receipt";
 import { parseAsInteger, useQueryState } from "nuqs";
+import { useRouter } from "next/navigation";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_TOTAL_ITEMS = 3;
@@ -314,12 +315,16 @@ const ReceiptsFilters = ({
 };
 
 const ReceiptsGrid = ({ receipts }: { receipts: ReceiptWithProducts[] }) => {
+
+  const router = useRouter();
+
   return (
     <div className="text-navy-blue my-6 grid grid-cols-1 md:grid-cols-3 gap-6">
       {receipts.map((receipt) => (
         <Card
           key={receipt.id}
-          className="flex h-full cursor-pointer flex-col transition-shadow hover:shadow-md"
+          className="flex h-full cursor-pointer flex-col transition-shadow hover:shadow-md hover:scale-105 hover:duration-600"
+          onClick={() => {router.push(`/receipts/${receipt.id}`)}}
         >
           <CardHeader className="text-navy-blue flex justify-between">
             <div className="flex flex-row items-center gap-2">
