@@ -4,6 +4,9 @@ import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { useState, useEffect } from "react";
 import PageLoader from "~/components/layout/pageLoader";
+import { HiMapPin } from "react-icons/hi2";
+import ReactDOMServer from "react-dom/server";
+import type { DivIcon } from "leaflet";
 
 interface GeocodeResponseType {
   response?: {
@@ -28,28 +31,53 @@ export default function StoreMap({ address }: { address: string }) {
   const [position, setPosition] = useState<[number, number]>([
     47.025604, 28.830367,
   ]);
+  const [customIcon, setCustomIcon] = useState<DivIcon>();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const getGeocode = async () => {
-      const response = await fetch("/api/geocode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address,
-        }),
-      });
-      const data = (await response.json()) as GeocodeResponseType;
-      const coords = data?.response?.bbox;
-      // for some locations, the geocode is not found by the API
-      // to do: show appropiate fallback
-      if (coords && coords.length > 3) setPosition([coords[3], coords[0]]);
-      setLoading(false);
+      try {
+        const response = await fetch("/api/geocode", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            address,
+          }),
+        });
+        const data = (await response.json()) as GeocodeResponseType;
+        const coords = data?.response?.bbox;
+        // for some locations, the geocode is not found by the API
+        // to do: show appropiate fallback
+        if (coords && coords.length > 3) setPosition([coords[3], coords[0]]);
+      } catch (error) {
+        console.log("Client-sided error: ", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     void getGeocode();
+  }, [address]);
+
+  useEffect(() => {
+    const createCustomIcon = async () => {
+      if (typeof window === "undefined") return;
+
+      const L = await import("leaflet");
+      const icon = L.divIcon({
+      className: "custom-pin-icon",
+        html: ReactDOMServer.renderToString(
+          <HiMapPin size={34} className="text-red-800" />,
+        ),
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+      });
+      setCustomIcon(icon);
+    };
+
+    void createCustomIcon();
   }, []);
 
   return (
@@ -59,14 +87,14 @@ export default function StoreMap({ address }: { address: string }) {
       ) : (
         <MapContainer
           center={position}
-          zoom={13}
+          zoom={15}
           style={{ height: "60vh", width: "100%" }}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          <Marker position={[51.505, -0.09] as [number, number]} />
+          <Marker position={position} icon={customIcon} />
         </MapContainer>
       )}
     </>
