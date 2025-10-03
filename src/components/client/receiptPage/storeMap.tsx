@@ -52,7 +52,7 @@ export default function StoreMap({ address }: { address: string }) {
         // to do: show appropiate fallback
         if (coords && coords.length > 3) setPosition([coords[3], coords[0]]);
       } catch (error) {
-        console.log("Client-sided error: ", error);
+        console.error("Client-sided error: ", error);
       } finally {
         setLoading(false);
       }

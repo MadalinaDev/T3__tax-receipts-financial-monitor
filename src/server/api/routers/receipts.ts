@@ -45,9 +45,29 @@ export const receiptsRouter = createTRPCRouter({
       .select()
       .from(receipts)
       .where(eq(receipts.userId, ctx.session.user.id))
-      .orderBy(sql`${receipts.dateTime} ASC`);
 
-    return receiptsResult;
+    if (!receiptsResult.length) {
+      return [];
+    }
+    const receiptIds = receiptsResult.map((receipt) => receipt.id);
+
+    const productsData = await ctx.db
+      .select()
+      .from(products)
+      .where(inArray(products.receiptId, receiptIds));
+
+    const productsByReceiptId: Record<string, ProductsTableType[]> = {};
+    for (const product of productsData) {
+      productsByReceiptId[product.receiptId] ??= [];
+      productsByReceiptId[product.receiptId]!.push(product);
+    }
+
+    const receiptsWithProducts = receiptsResult.map((receipt) => ({
+      ...receipt,
+      products: productsByReceiptId[receipt.id] ?? [],
+    }));
+
+    return receiptsWithProducts;
   }),
 
   getOne: protectedProcedure
@@ -60,9 +80,7 @@ export const receiptsRouter = createTRPCRouter({
 
       const receipt = receiptResult[0];
       if (!receipt) {
-          throw new Error(
-            "Server-side error: No receipt was found.",
-          );
+        throw new Error("Server-side error: No receipt was found.");
       }
 
       const productsData = await ctx.db

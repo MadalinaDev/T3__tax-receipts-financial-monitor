@@ -7,19 +7,14 @@ import { type ReceiptsTableType } from "~/server/db/schema/receipts";
 import { type ProductsTableType } from "~/server/db/schema/products";
 import { type ChartTypeSpendingsOverTime } from "~/types/statisticsCharts";
 import { CATEGORIES } from "~/lib/constants";
+import { categorizeProductsWithOpenAI } from "~/lib/productsCategorization";
+import type { ReceiptWithProducts } from "~/types/receipt";
 
 const updateProductsCategorizationsViaOpenAI = async (
-  receipts: ReceiptsTableType[],
+  receipts: ReceiptWithProducts[],
 ) => {
-  await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/openai`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      receipts: receipts ?? [],
-    }),
-  });
+  const response = await categorizeProductsWithOpenAI(receipts);
+  console.log("Response from OpenAI product categorization: ", response);
 };
 
 const generateSpendingsOverTime = (
@@ -63,7 +58,6 @@ const generateProductsByCategory = (products: ProductsTableType[]) => {
 const StatisticsContent = async () => {
   const receipts = await api.receipts.getAll();
 
-
   await updateProductsCategorizationsViaOpenAI(receipts);
 
   const chartDataSpendingsOverTime = generateSpendingsOverTime(receipts);
@@ -71,7 +65,7 @@ const StatisticsContent = async () => {
   const chartDataProductsByCategory = generateProductsByCategory(products);
 
   return (
-    <div className="flex flex-col gap-y-2 my-8 md:gap-y-4 md:my-12">
+    <div className="my-8 flex flex-col gap-y-2 md:my-12 md:gap-y-4">
       <SpendingsOverTimeChart data={chartDataSpendingsOverTime} />
       <ProductsByCategoryChart data={chartDataProductsByCategory} />
     </div>
